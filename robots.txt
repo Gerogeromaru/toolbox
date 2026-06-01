@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gerogeromaru.github.io/toolbox/sitemap.xml

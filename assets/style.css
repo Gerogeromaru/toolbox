@@ -1,0 +1,127 @@
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --ink: #1c2430;
+  --muted: #5b6776;
+  --brand: #2f6df6;
+  --brand-dark: #1f53c9;
+  --line: #e6e9ef;
+  --good: #18a558;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+}
+
+a { color: var(--brand); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+
+header.site {
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+header.site .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 58px;
+}
+header.site .logo { font-weight: 800; font-size: 18px; color: var(--ink); }
+header.site nav a { margin-left: 16px; font-size: 14px; color: var(--muted); }
+
+h1 { font-size: 26px; line-height: 1.4; margin: 24px 0 8px; }
+h2 { font-size: 20px; margin: 32px 0 8px; }
+.lead { color: var(--muted); margin: 0 0 8px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin: 16px 0;
+}
+
+label { display: block; font-weight: 600; margin-bottom: 6px; }
+.row { margin-bottom: 16px; }
+input[type="number"], select {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+.hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+button.primary {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--brand);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+button.primary:hover { background: var(--brand-dark); }
+
+.result { margin-top: 8px; }
+.result .big {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--good);
+}
+.result .sub { color: var(--muted); font-size: 14px; }
+
+table.breakdown { width: 100%; border-collapse: collapse; margin-top: 12px; }
+table.breakdown th, table.breakdown td {
+  text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); font-size: 15px;
+}
+table.breakdown td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.tool-list { list-style: none; padding: 0; margin: 16px 0; }
+.tool-list li { margin: 10px 0; }
+.tool-list a {
+  display: block;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  color: var(--ink);
+}
+.tool-list a:hover { border-color: var(--brand); text-decoration: none; }
+.tool-list .t { font-weight: 700; }
+.tool-list .d { color: var(--muted); font-size: 14px; }
+
+.disclaimer { font-size: 13px; color: var(--muted); }
+
+.ad-slot {
+  min-height: 90px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #aeb6c2; font-size: 13px;
+  margin: 20px 0;
+}
+
+footer.site {
+  border-top: 1px solid var(--line);
+  margin-top: 40px;
+  padding: 24px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+footer.site a { color: var(--muted); margin-right: 14px; }
+
+.faq dt { font-weight: 700; margin-top: 14px; }
+.faq dd { margin: 4px 0 0; color: var(--muted); }

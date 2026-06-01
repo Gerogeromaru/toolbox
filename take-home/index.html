@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>年収手取り計算ツール（2026年版・会社員向け概算）| Toolbox</title>
+<meta name="description" content="年収を入力するだけで、手取り額・所得税・住民税・社会保険料の概算を自動計算。会社員（給与所得者）向けの無料シミュレーターです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/take-home/">
+<meta property="og:title" content="年収手取り計算ツール（2026年版）">
+<meta property="og:description" content="年収から手取り・税金・社会保険料の概算を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/take-home/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>年収手取り計算ツール</h1>
+  <p class="lead">年収を入力すると、手取り額・所得税・住民税・社会保険料の<strong>概算</strong>を自動で計算します（会社員＝給与所得者向け）。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="annual">額面年収（円）</label>
+      <input type="number" id="annual" inputmode="numeric" placeholder="例：4000000" min="0" step="100000">
+      <div class="hint">ボーナス込みの税引き前の年収を入力してください。</div>
+    </div>
+    <div class="row">
+      <label for="age">年齢</label>
+      <select id="age">
+        <option value="under40" selected>40歳未満（介護保険なし）</option>
+        <option value="over40">40〜64歳（介護保険あり）</option>
+      </select>
+    </div>
+    <button class="primary" id="calc">手取りを計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">あなたの手取り（年間・概算）</p>
+      <div class="big" id="takehome">—</div>
+      <p class="sub">月あたり手取り 概算：<span id="monthly">—</span></p>
+      <table class="breakdown">
+        <tr><th>額面年収</th><td class="num" id="r-gross"></td></tr>
+        <tr><th>− 社会保険料</th><td class="num" id="r-social"></td></tr>
+        <tr><th>− 所得税</th><td class="num" id="r-income"></td></tr>
+        <tr><th>− 住民税</th><td class="num" id="r-resident"></td></tr>
+        <tr><th><strong>＝ 手取り</strong></th><td class="num" id="r-take"><strong></strong></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>手取りとは？</h2>
+  <p>手取りとは、額面の年収（会社が支払う総額）から<strong>社会保険料・所得税・住民税</strong>を差し引いた、実際に銀行口座へ振り込まれる金額のことです。一般に手取りは額面のおよそ75〜85%程度になります。</p>
+
+  <h2>計算に含まれる控除</h2>
+  <table class="breakdown">
+    <tr><th>社会保険料</th><td>健康保険・厚生年金・雇用保険（40歳以上は介護保険を加算）</td></tr>
+    <tr><th>所得税</th><td>課税所得に応じた累進課税。復興特別所得税2.1%を含みます。</td></tr>
+    <tr><th>住民税</th><td>課税所得のおおむね10％＋均等割（概算5,000円）。</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>この計算はどれくらい正確ですか？</dt>
+    <dd>あくまで<strong>概算</strong>です。健康保険料率は加入先（協会けんぽ・健保組合）や都道府県で異なり、扶養家族・各種控除（生命保険料控除など）は考慮していません。目安としてご利用ください。</dd>
+    <dt>前提条件は？</dt>
+    <dd>会社員（給与所得者）・独身・扶養なし・協会けんぽ（東京）相当の料率で計算しています。賞与は年収に含めて月割換算しています。</dd>
+    <dt>自営業・フリーランスでも使えますか？</dt>
+    <dd>このツールは給与所得者向けです。自営業の方は国民健康保険・国民年金など計算方法が異なります。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は概算であり、正確な税額・保険料を保証するものではありません。実際の金額は勤務先・自治体・個人の状況により異なります。重要な判断は税理士等の専門家にご相談ください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+
+function employmentIncomeDeduction(annual){
+  if (annual <= 1625000) return 550000;
+  if (annual <= 1800000) return annual*0.4 - 100000;
+  if (annual <= 3600000) return annual*0.3 + 80000;
+  if (annual <= 6600000) return annual*0.2 + 440000;
+  if (annual <= 8500000) return annual*0.1 + 1100000;
+  return 1950000;
+}
+
+function incomeTaxBase(taxable){
+  if (taxable <= 1949000) return taxable*0.05;
+  if (taxable <= 3299000) return taxable*0.10 - 97500;
+  if (taxable <= 6949000) return taxable*0.20 - 427500;
+  if (taxable <= 8999000) return taxable*0.23 - 636000;
+  if (taxable <= 17999000) return taxable*0.33 - 1536000;
+  if (taxable <= 39999000) return taxable*0.40 - 2796000;
+  return taxable*0.45 - 4796000;
+}
+
+function calculate(annual, over40){
+  // --- 社会保険料（従業員負担分・概算）---
+  const healthRate = over40 ? 0.0582 : 0.0499; // 介護保険込み/なし（協会けんぽ東京 概算の半額）
+  const health = annual * healthRate;
+  const pension = Math.min(annual, 7500000) * 0.0915; // 厚生年金 18.3%/2、標準報酬上限を概算
+  const employment = annual * 0.006; // 雇用保険
+  const social = health + pension + employment;
+
+  // --- 所得税 ---
+  const kyuyo = employmentIncomeDeduction(annual);
+  let taxableIncome = annual - kyuyo - social - 480000; // 基礎控除48万
+  taxableIncome = Math.max(0, Math.floor(taxableIncome/1000)*1000);
+  const incomeTax = incomeTaxBase(taxableIncome) * 1.021; // 復興特別所得税
+
+  // --- 住民税（概算）---
+  let taxableResident = annual - kyuyo - social - 430000; // 基礎控除43万
+  taxableResident = Math.max(0, taxableResident);
+  const residentTax = taxableResident * 0.10 + 5000; // 所得割10%＋均等割概算
+
+  const takeHome = annual - social - incomeTax - residentTax;
+  return { social, incomeTax, residentTax, takeHome };
+}
+
+document.getElementById('calc').addEventListener('click', function(){
+  const annual = parseFloat(document.getElementById('annual').value);
+  if (!annual || annual <= 0) { alert('額面年収を入力してください'); return; }
+  const over40 = document.getElementById('age').value === 'over40';
+  const r = calculate(annual, over40);
+
+  document.getElementById('takehome').textContent = yen(r.takeHome);
+  document.getElementById('monthly').textContent = yen(r.takeHome/12);
+  document.getElementById('r-gross').textContent = yen(annual);
+  document.getElementById('r-social').textContent = yen(r.social);
+  document.getElementById('r-income').textContent = yen(r.incomeTax);
+  document.getElementById('r-resident').textContent = yen(r.residentTax);
+  document.querySelector('#r-take strong').textContent = yen(r.takeHome);
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

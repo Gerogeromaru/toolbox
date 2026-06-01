@@ -91,6 +91,18 @@ table.breakdown th, table.breakdown td {
 }
 table.breakdown td.num { text-align: right; font-variant-numeric: tabular-nums; }
 
+.cat-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 8px; }
+.cat-nav a {
+  display: inline-block;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: var(--ink);
+}
+.cat-nav a:hover { border-color: var(--brand); text-decoration: none; }
+
 .tool-list { list-style: none; padding: 0; margin: 16px 0; }
 .tool-list li { margin: 10px 0; }
 .tool-list a {

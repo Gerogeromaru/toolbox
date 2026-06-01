@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ガチャ確率計算ツール（○回引いて当たる確率）| Toolbox</title>
+<meta name="description" content="1回の当選確率と試行回数を入力するだけで、「少なくとも1回当たる確率」や期待当選数を自動計算。ガチャやくじの確率の目安に。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/gacha/">
+<meta property="og:title" content="ガチャ確率計算ツール（○回引いて当たる確率）">
+<meta property="og:description" content="当選確率と回数から「少なくとも1回当たる確率」を計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/gacha/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>ガチャ確率計算ツール</h1>
+  <p class="lead">1回あたりの当選確率と引く回数を入力すると、<strong>少なくとも1回当たる確率</strong>と期待当選数を自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="prob">1回あたりの当選確率（%）</label>
+      <input type="number" id="prob" inputmode="decimal" placeholder="例：3" min="0" max="100" step="any">
+      <div class="hint">「1%」なら 1、「0.5%」なら 0.5 と入力してください。</div>
+    </div>
+    <div class="row">
+      <label for="times">引く回数</label>
+      <input type="number" id="times" inputmode="numeric" placeholder="例：100" min="1" step="1">
+    </div>
+    <button class="primary" id="calc">確率を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">少なくとも1回当たる確率</p>
+      <div class="big" id="atleast">—</div>
+      <table class="breakdown">
+        <tr><th>少なくとも1回当たる確率</th><td class="num" id="r-atleast"></td></tr>
+        <tr><th>1回も当たらない確率</th><td class="num" id="r-none"></td></tr>
+        <tr><th>期待当選数（平均）</th><td class="num" id="r-expect"></td></tr>
+        <tr><th>50%を超えるのに必要な回数</th><td class="num" id="r-half"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>計算方法</h2>
+  <p>1回の当選確率を p とすると、n回引いて<strong>1回も当たらない確率は (1−p)<sup>n</sup></strong>、<strong>少なくとも1回当たる確率は 1 −(1−p)<sup>n</sup></strong> です。たとえば1%のガチャを100回引いても、当たる確率は100%ではなく約63%にとどまります。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>1%を100回引けば必ず当たりますか？</dt>
+    <dd>いいえ。約63%です。確率は「引くほど上がる」ものの、何回引いても100%にはなりません。</dd>
+    <dt>「期待当選数」とは？</dt>
+    <dd>平均すると何回当たる見込みかを表す数値で、確率 × 回数で求めます。1未満でも当たることはありますし、期待値どおりになるとは限りません。</dd>
+    <dt>天井（一定回数で確定）には対応していますか？</dt>
+    <dd>本ツールは毎回独立した確率での計算です。天井ありのガチャには対応していません。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールは各回が独立した確率である前提の理論計算です。実際の結果を保証するものではありません。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function pct(x){ return (x * 100).toFixed(2) + '%'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const prob = parseFloat(document.getElementById('prob').value);
+  const times = parseInt(document.getElementById('times').value, 10);
+  if (isNaN(prob) || prob < 0 || prob > 100) { alert('当選確率を0〜100の間で入力してください'); return; }
+  if (!(times >= 1)) { alert('引く回数を入力してください'); return; }
+
+  const p = prob / 100;
+  const none = Math.pow(1 - p, times);
+  const atleast = 1 - none;
+  const expect = p * times;
+
+  document.getElementById('atleast').textContent = pct(atleast);
+  document.getElementById('r-atleast').textContent = pct(atleast);
+  document.getElementById('r-none').textContent = pct(none);
+  document.getElementById('r-expect').textContent = expect.toFixed(2) + ' 回';
+
+  // 50%を超えるのに必要な回数: n > ln(0.5)/ln(1-p)
+  let halfText;
+  if (p <= 0) { halfText = '当たりません'; }
+  else if (p >= 1) { halfText = '1回'; }
+  else { halfText = Math.ceil(Math.log(0.5) / Math.log(1 - p)) + ' 回'; }
+  document.getElementById('r-half').textContent = halfText;
+
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

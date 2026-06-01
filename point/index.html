@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ポイント還元計算ツール（実質価格・実質割引率を計算）| Toolbox</title>
+<meta name="description" content="価格と還元率を入力するだけで、獲得ポイント・ポイント分を引いた実質価格・実質割引率を自動計算。お得な買い物の判断に便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/point/">
+<meta property="og:title" content="ポイント還元計算ツール（実質価格・実質割引率を計算）">
+<meta property="og:description" content="還元率から獲得ポイントと実質価格を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/point/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>ポイント還元計算ツール</h1>
+  <p class="lead">価格と還元率を入力すると、<strong>獲得ポイント・実質価格・実質割引率</strong>を自動で計算します。複数のポイントを合算した還元率にも対応します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="price">価格（円）</label>
+      <input type="number" id="price" inputmode="numeric" placeholder="例：5000" min="0" step="1">
+    </div>
+    <div class="row">
+      <label for="rate">還元率（%）</label>
+      <input type="number" id="rate" inputmode="decimal" placeholder="例：10" min="0" step="0.1">
+      <div class="hint">複数のポイント（例：3%＋2%）は合計して入力してください。</div>
+    </div>
+    <button class="primary" id="calc">実質価格を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">実質価格（ポイント分を引いた負担額）</p>
+      <div class="big" id="net">—</div>
+      <table class="breakdown">
+        <tr><th>支払い価格</th><td class="num" id="r-price"></td></tr>
+        <tr><th>獲得ポイント</th><td class="num" id="r-point"></td></tr>
+        <tr><th>実質価格</th><td class="num" id="r-net"></td></tr>
+        <tr><th>実質割引率</th><td class="num" id="r-disc"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>「○%還元」と「○%割引」の違い</h2>
+  <p>割引は支払い時に値段が下がりますが、ポイント還元は<strong>後でポイントが付与される</strong>仕組みです。同じ「10%」でも、還元は次回以降に使える点、有効期限がある点などが割引と異なります。実質的なお得度は「実質割引率」で比較できます。</p>
+
+  <h2>計算方法</h2>
+  <table class="breakdown">
+    <tr><th>獲得ポイント</th><td>価格 × 還元率 ÷ 100（1ポイント1円換算）</td></tr>
+    <tr><th>実質価格</th><td>価格 − 獲得ポイント</td></tr>
+    <tr><th>実質割引率</th><td>還元率と同じ（1ポイント1円の場合）</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>ポイントの端数はどうなりますか？</dt>
+    <dd>多くのサービスでポイントは小数点以下切り捨てです。本ツールは切り捨てで獲得ポイントを表示します。</dd>
+    <dt>1ポイント1円じゃない場合は？</dt>
+    <dd>本ツールは1ポイント＝1円相当で計算しています。レートが異なる場合は実質価格も変わります。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は目安です。ポイントの付与条件・有効期限・利用可能店舗などはサービスにより異なります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const price = parseFloat(document.getElementById('price').value);
+  const rate = parseFloat(document.getElementById('rate').value);
+  if (!(price > 0)) { alert('価格を入力してください'); return; }
+  if (isNaN(rate) || rate < 0) { alert('還元率を入力してください'); return; }
+
+  const point = Math.floor(price * rate / 100);
+  const net = price - point;
+
+  document.getElementById('net').textContent = yen(net);
+  document.getElementById('r-price').textContent = yen(price);
+  document.getElementById('r-point').textContent = point.toLocaleString('ja-JP') + ' ポイント';
+  document.getElementById('r-net').textContent = yen(net);
+  document.getElementById('r-disc').textContent = (price > 0 ? (point / price * 100).toFixed(1) : '0') + '%';
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

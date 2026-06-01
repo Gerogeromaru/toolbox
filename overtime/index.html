@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>残業代計算ツール（割増率つきで残業手当を概算）| Toolbox</title>
+<meta name="description" content="基礎時給と残業時間、割増の種類を選ぶだけで残業代を自動計算。時間外25%・深夜・休日などの割増率に対応した会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/overtime/">
+<meta property="og:title" content="残業代計算ツール（割増率つきで残業手当を概算）">
+<meta property="og:description" content="基礎時給と残業時間から割増つきの残業代を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/overtime/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>残業代計算ツール</h1>
+  <p class="lead">1時間あたりの基礎賃金（時給）と残業時間、割増の種類を選ぶと、<strong>残業代</strong>の概算を自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="base">1時間あたりの基礎賃金（円）</label>
+      <input type="number" id="base" inputmode="numeric" placeholder="例：2000" min="0" step="10">
+      <div class="hint">月給制の方は「月給 ÷ 月の平均所定労働時間」で求められます。</div>
+    </div>
+    <div class="row">
+      <label for="rate">割増の種類</label>
+      <select id="rate">
+        <option value="0.25" selected>時間外労働（25%増）</option>
+        <option value="0.50">時間外＋深夜（50%増）</option>
+        <option value="0.35">休日労働（35%増）</option>
+        <option value="0.60">休日＋深夜（60%増）</option>
+        <option value="0.50">月60時間超の時間外（50%増）</option>
+        <option value="0.25">深夜労働のみ（25%増）</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="hours">残業時間（時間）</label>
+      <input type="number" id="hours" inputmode="decimal" placeholder="例：20" min="0" step="0.5">
+    </div>
+    <button class="primary" id="calc">残業代を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">残業代（概算）</p>
+      <div class="big" id="pay">—</div>
+      <table class="breakdown">
+        <tr><th>基礎賃金（時給）</th><td class="num" id="r-base"></td></tr>
+        <tr><th>割増単価（1時間あたり）</th><td class="num" id="r-unit"></td></tr>
+        <tr><th>残業時間</th><td class="num" id="r-hours"></td></tr>
+        <tr><th><strong>残業代</strong></th><td class="num" id="r-pay"><strong></strong></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>割増賃金率の基準（労働基準法）</h2>
+  <table class="breakdown">
+    <tr><th>時間外労働</th><td>25%以上（1日8時間・週40時間を超える分）</td></tr>
+    <tr><th>深夜労働</th><td>25%以上（22時〜翌5時）</td></tr>
+    <tr><th>休日労働</th><td>35%以上（法定休日）</td></tr>
+    <tr><th>月60時間超の時間外</th><td>50%以上</td></tr>
+  </table>
+  <p>時間外と深夜が重なる場合は25%＋25%＝50%、休日と深夜が重なる場合は35%＋25%＝60%が目安です。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>基礎賃金には何が含まれますか？</dt>
+    <dd>基本給のほか、原則として手当も含めて計算しますが、家族手当・通勤手当・住宅手当など一部は除外できます。正確には就業規則や給与明細をご確認ください。</dd>
+    <dt>みなし残業（固定残業代）の場合は？</dt>
+    <dd>固定残業時間を超えた分が追加の残業代になります。本ツールは超過分の時間を入力してご利用ください。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は概算です。実際の割増率・基礎賃金の範囲は就業規則や法令により異なります。未払い等の判断は労働基準監督署や専門家にご相談ください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const base = parseFloat(document.getElementById('base').value);
+  const rate = parseFloat(document.getElementById('rate').value);
+  const hours = parseFloat(document.getElementById('hours').value);
+  if (!(base > 0)) { alert('基礎賃金（時給）を入力してください'); return; }
+  if (!(hours > 0)) { alert('残業時間を入力してください'); return; }
+
+  const unit = base * (1 + rate);
+  const pay = unit * hours;
+
+  document.getElementById('pay').textContent = yen(pay);
+  document.getElementById('r-base').textContent = yen(base);
+  document.getElementById('r-unit').textContent = yen(unit) + '（' + Math.round(rate*100) + '%増）';
+  document.getElementById('r-hours').textContent = hours + '時間';
+  document.querySelector('#r-pay strong').textContent = yen(pay);
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

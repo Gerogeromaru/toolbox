@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学年早見・入学卒業年度計算ツール（生年月日から）| Toolbox</title>
+<meta name="description" content="生年月日を入力するだけで、今の学年や小学校・中学校・高校・大学の入学＆卒業年度を自動計算。早生まれにも対応した会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/school-year/">
+<meta property="og:title" content="学年早見・入学卒業年度計算ツール（生年月日から）">
+<meta property="og:description" content="生年月日から学年と入学・卒業年度を自動計算する無料ツール。早生まれ対応。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/school-year/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>学年早見・入学卒業年度 計算ツール</h1>
+  <p class="lead">生年月日を入力すると、<strong>現在の学年</strong>と、小学校〜大学の<strong>入学・卒業年度</strong>を自動で計算します（早生まれ対応）。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="birth">生年月日</label>
+      <input type="date" id="birth">
+    </div>
+    <button class="primary" id="calc">学年・年度を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub" id="now-label">現在（2026年度）の学年</p>
+      <div class="big" id="grade">—</div>
+      <table class="breakdown">
+        <tr><th>小学校 入学</th><td class="num" id="r-e-in"></td></tr>
+        <tr><th>小学校 卒業</th><td class="num" id="r-e-out"></td></tr>
+        <tr><th>中学校 卒業</th><td class="num" id="r-j-out"></td></tr>
+        <tr><th>高校 卒業</th><td class="num" id="r-h-out"></td></tr>
+        <tr><th>大学 卒業（4年制）</th><td class="num" id="r-u-out"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>学年の決まり方</h2>
+  <p>日本の学年は<strong>4月2日〜翌年4月1日生まれ</strong>が同じ学年になります。4月1日生まれは「早生まれ」として前の学年に入ります。小学校へは満6歳になった後の最初の4月に入学します。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>なぜ4月1日生まれは早生まれなの？</dt>
+    <dd>法律上、年齢は誕生日の前日が終わる時点で1つ増えるため、4月1日生まれは3月31日に満6歳となり、その年の4月に入学する扱いになります。</dd>
+    <dt>「年度」とは？</dt>
+    <dd>4月1日から翌年3月31日までの期間です。たとえば「2026年度」は2026年4月〜2027年3月を指します。</dd>
+    <dt>留年・浪人・飛び級は反映されますか？</dt>
+    <dd>いいえ。生年月日から標準的に進学した場合の年度を表示します。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールは標準的な進学を前提とした概算です。実際の在籍状況とは異なる場合があります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+// 現在の年度（4月始まり）
+function currentFiscalYear(){
+  const now = new Date();
+  return now.getMonth() + 1 >= 4 ? now.getFullYear() : now.getFullYear() - 1;
+}
+
+document.getElementById('calc').addEventListener('click', function(){
+  const v = document.getElementById('birth').value;
+  if (!v) { alert('生年月日を入力してください'); return; }
+  const b = new Date(v + 'T00:00:00');
+  const y = b.getFullYear();
+  const m = b.getMonth() + 1;
+  const d = b.getDate();
+
+  // 小学校入学年度：1/1〜4/1生まれは +6、4/2〜12/31生まれは +7
+  const early = (m < 4) || (m === 4 && d === 1);
+  const enterYear = early ? y + 6 : y + 7;
+
+  document.getElementById('r-e-in').textContent = enterYear + '年度（' + enterYear + '年4月）';
+  document.getElementById('r-e-out').textContent = (enterYear + 6) + '年度（' + (enterYear + 7) + '年3月）';
+  document.getElementById('r-j-out').textContent = (enterYear + 9) + '年度（' + (enterYear + 10) + '年3月）';
+  document.getElementById('r-h-out').textContent = (enterYear + 12) + '年度（' + (enterYear + 13) + '年3月）';
+  document.getElementById('r-u-out').textContent = (enterYear + 16) + '年度（' + (enterYear + 17) + '年3月）';
+
+  // 現在の学年
+  const fy = currentFiscalYear();
+  document.getElementById('now-label').textContent = '現在（' + fy + '年度）の学年';
+  const n = fy - enterYear + 1; // 1=小1
+  let label;
+  if (n < 1) label = 'まだ就学前です';
+  else if (n <= 6) label = '小学' + n + '年生';
+  else if (n <= 9) label = '中学' + (n - 6) + '年生';
+  else if (n <= 12) label = '高校' + (n - 9) + '年生';
+  else if (n <= 16) label = '大学' + (n - 12) + '年生（4年制の場合）';
+  else label = '学校教育の標準課程を終えています';
+  document.getElementById('grade').textContent = label;
+
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

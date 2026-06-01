@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>単価比較ツール（どっちがお得？グラム・個あたり価格）| Toolbox</title>
+<meta name="description" content="2つの商品の価格と内容量を入力するだけで、単価（gあたり・mLあたり・1個あたり）を計算してどちらがお得か比較。買い物のコスパ判断に便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/unit-price/">
+<meta property="og:title" content="単価比較ツール（どっちがお得？グラム・個あたり価格）">
+<meta property="og:description" content="2商品の価格と内容量から単価を計算してお得な方を判定する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/unit-price/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>単価比較ツール（どっちがお得？）</h1>
+  <p class="lead">2つの商品の価格と内容量を入力すると、<strong>単位あたりの価格</strong>を計算して、どちらがお得かを判定します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="unitname">単位（g・mL・個 など）</label>
+      <input type="text" id="unitname" placeholder="例：g" value="g">
+    </div>
+
+    <h2 style="font-size:17px;margin:8px 0;">商品A</h2>
+    <div class="row">
+      <label for="priceA">価格（円）</label>
+      <input type="number" id="priceA" inputmode="numeric" placeholder="例：298" min="0" step="1">
+    </div>
+    <div class="row">
+      <label for="qtyA">内容量</label>
+      <input type="number" id="qtyA" inputmode="decimal" placeholder="例：500" min="0" step="any">
+    </div>
+
+    <h2 style="font-size:17px;margin:16px 0 8px;">商品B</h2>
+    <div class="row">
+      <label for="priceB">価格（円）</label>
+      <input type="number" id="priceB" inputmode="numeric" placeholder="例：450" min="0" step="1">
+    </div>
+    <div class="row">
+      <label for="qtyB">内容量</label>
+      <input type="number" id="qtyB" inputmode="decimal" placeholder="例：800" min="0" step="any">
+    </div>
+
+    <button class="primary" id="calc">お得な方を比較する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">お得なのは</p>
+      <div class="big" id="winner">—</div>
+      <table class="breakdown">
+        <tr><th>商品A の単価</th><td class="num" id="r-a"></td></tr>
+        <tr><th>商品B の単価</th><td class="num" id="r-b"></td></tr>
+        <tr><th>差（お得な方の割安率）</th><td class="num" id="r-diff"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>使い方のヒント</h2>
+  <p>容量の単位はそろえてください（例：両方ともgで入力、または両方ともmL）。「100gあたり○円」のように単位あたりの価格で比べることで、内容量が違う商品でも本当にお得な方が分かります。詰め替え用や大容量パックの比較に便利です。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>「個」単位でも使えますか？</dt>
+    <dd>はい。単位欄に「個」と入れ、内容量に個数を入力すれば1個あたりの価格を比較できます。</dd>
+    <dt>3商品以上は比べられますか？</dt>
+    <dd>本ツールは2商品の比較に対応しています。3つ目は、勝った方ともう一度比較してください。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールは入力された価格・容量のみで単純比較します。品質・好み・賞味期限などは考慮していません。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function num(n){ return parseFloat(n.toPrecision(6)).toLocaleString('ja-JP', { maximumFractionDigits: 4 }); }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const unit = document.getElementById('unitname').value.trim() || '単位';
+  const pA = parseFloat(document.getElementById('priceA').value);
+  const qA = parseFloat(document.getElementById('qtyA').value);
+  const pB = parseFloat(document.getElementById('priceB').value);
+  const qB = parseFloat(document.getElementById('qtyB').value);
+  if (!(pA > 0) || !(qA > 0)) { alert('商品Aの価格と内容量を入力してください'); return; }
+  if (!(pB > 0) || !(qB > 0)) { alert('商品Bの価格と内容量を入力してください'); return; }
+
+  const uA = pA / qA;
+  const uB = pB / qB;
+
+  document.getElementById('r-a').textContent = num(uA) + ' 円/' + unit;
+  document.getElementById('r-b').textContent = num(uB) + ' 円/' + unit;
+
+  const winner = document.getElementById('winner');
+  const diffEl = document.getElementById('r-diff');
+  if (Math.abs(uA - uB) < 1e-9) {
+    winner.textContent = '同じ単価';
+    diffEl.textContent = '差はありません';
+  } else {
+    const aWin = uA < uB;
+    const cheap = aWin ? uA : uB;
+    const exp = aWin ? uB : uA;
+    const rate = (1 - cheap / exp) * 100;
+    winner.textContent = aWin ? '商品A' : '商品B';
+    diffEl.textContent = '約 ' + rate.toFixed(1) + '% 割安';
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>為替計算ツール（レート手入力で外貨⇔円を換算）| Toolbox</title>
+<meta name="description" content="為替レートと金額を入力するだけで、外貨から円・円から外貨へ換算。ドル・ユーロなど任意の通貨に対応した会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/currency/">
+<meta property="og:title" content="為替計算ツール（レート手入力で外貨⇔円を換算）">
+<meta property="og:description" content="為替レートと金額から外貨と円を相互換算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/currency/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>為替計算ツール</h1>
+  <p class="lead">為替レートと金額を入力すると、<strong>外貨 ⇔ 円</strong>を換算します。レートは手入力なので、ドル・ユーロなどどの通貨にも使えます。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="rate">為替レート（1外貨 ＝ ○円）</label>
+      <input type="number" id="rate" inputmode="decimal" placeholder="例：155（1ドル=155円）" min="0" step="any">
+      <div class="hint">最新レートは検索などでご確認のうえ入力してください。</div>
+    </div>
+    <div class="row">
+      <label for="mode">変換の向き</label>
+      <select id="mode">
+        <option value="f2j" selected>外貨 → 円</option>
+        <option value="j2f">円 → 外貨</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="amount" id="amount-label">金額（外貨）</label>
+      <input type="number" id="amount" inputmode="decimal" placeholder="例：100" min="0" step="any">
+    </div>
+    <button class="primary" id="calc">換算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">換算結果</p>
+      <div class="big" id="out">—</div>
+      <p class="sub" id="sub"></p>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>使い方</h2>
+  <p>「為替レート」には、1外貨が何円かを入力します（例：1ドル＝155円なら「155」）。あとは変換の向きを選び、金額を入れるだけです。海外旅行の予算や、海外通販の値段を円で把握したいときに便利です。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>レートは自動で取得されますか？</dt>
+    <dd>いいえ。このツールはレートを手入力する方式です。常に最新の正確なレートを使いたい場合は、ご自身で現在のレートを確認して入力してください。</dd>
+    <dt>両替手数料は含まれますか？</dt>
+    <dd>含まれません。実際の両替やカード決済では、レートに手数料が上乗せされることが一般的です。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールは入力されたレートで単純計算します。実際の為替レートは常に変動し、手数料も別途かかります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function num(n){ return parseFloat(n.toPrecision(10)).toLocaleString('ja-JP', { maximumFractionDigits: 2 }); }
+
+const modeEl = document.getElementById('mode');
+const amountLabel = document.getElementById('amount-label');
+modeEl.addEventListener('change', function(){
+  amountLabel.textContent = this.value === 'f2j' ? '金額（外貨）' : '金額（円）';
+  document.getElementById('result').hidden = true;
+});
+
+document.getElementById('calc').addEventListener('click', function(){
+  const rate = parseFloat(document.getElementById('rate').value);
+  const amount = parseFloat(document.getElementById('amount').value);
+  if (!(rate > 0)) { alert('為替レートを入力してください'); return; }
+  if (!(amount >= 0) || isNaN(amount)) { alert('金額を入力してください'); return; }
+
+  const out = document.getElementById('out');
+  const sub = document.getElementById('sub');
+
+  if (modeEl.value === 'f2j') {
+    const jpy = amount * rate;
+    out.textContent = num(jpy) + ' 円';
+    sub.textContent = '外貨 ' + num(amount) + ' × レート ' + num(rate) + ' 円';
+  } else {
+    const foreign = amount / rate;
+    out.textContent = num(foreign) + ' 外貨';
+    sub.textContent = '円 ' + num(amount) + ' ÷ レート ' + num(rate);
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

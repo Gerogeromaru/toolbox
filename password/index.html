@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>パスワード生成ツール（安全なランダムパスワードを作成）| Toolbox</title>
+<meta name="description" content="長さや文字種（大文字・小文字・数字・記号）を選ぶだけで、ブラウザ内で安全なランダムパスワードを生成。サーバー送信なしの会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/password/">
+<meta property="og:title" content="パスワード生成ツール（安全なランダムパスワードを作成）">
+<meta property="og:description" content="ブラウザ内で安全なランダムパスワードを生成する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/password/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>パスワード生成ツール</h1>
+  <p class="lead">長さと文字種を選ぶだけで、<strong>安全なランダムパスワード</strong>を生成します。処理はすべてブラウザ内で行われ、生成したパスワードがどこかに送信されることはありません。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="length">パスワードの長さ：<span id="len-val">16</span> 文字</label>
+      <input type="range" id="length" min="4" max="64" value="16" style="width:100%;">
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="lower" checked style="width:auto;"> 小文字（a-z）</label>
+      <label><input type="checkbox" id="upper" checked style="width:auto;"> 大文字（A-Z）</label>
+      <label><input type="checkbox" id="number" checked style="width:auto;"> 数字（0-9）</label>
+      <label><input type="checkbox" id="symbol" style="width:auto;"> 記号（!@#$%…）</label>
+      <label><input type="checkbox" id="noambig" style="width:auto;"> 紛らわしい文字を除く（l, I, 1, O, 0 など）</label>
+    </div>
+    <button class="primary" id="gen">パスワードを生成する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">生成されたパスワード</p>
+      <div class="big" id="pw" style="font-size:22px;word-break:break-all;font-family:monospace;">—</div>
+      <p class="sub">強度の目安：<span id="strength">—</span></p>
+      <button class="primary" id="copy" style="margin-top:8px;">コピーする</button>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>安全なパスワードのポイント</h2>
+  <ul>
+    <li>できるだけ<strong>長く</strong>する（12文字以上、可能なら16文字以上）</li>
+    <li>大文字・小文字・数字・記号を<strong>混ぜる</strong></li>
+    <li>名前・誕生日・辞書にある単語を避ける</li>
+    <li>サービスごとに<strong>使い回さない</strong></li>
+  </ul>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>生成したパスワードは安全ですか？</dt>
+    <dd>ブラウザの暗号学的乱数（Web Crypto API）を使って生成しています。通信もサーバー保存も行わず、すべて端末内で完結します。</dd>
+    <dt>「紛らわしい文字を除く」とは？</dt>
+    <dd>見間違えやすい l（小文字エル）・I（大文字アイ）・1（数字イチ）・O（大文字オー）・0（数字ゼロ）などを除外します。手入力する場面で便利です。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 生成したパスワードはご自身の責任で安全に管理してください。重要なアカウントでは2段階認証の併用を推奨します。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+const lenEl = document.getElementById('length');
+const lenVal = document.getElementById('len-val');
+lenEl.addEventListener('input', function(){ lenVal.textContent = this.value; });
+
+function randInt(max){
+  // 偏りの少ない暗号学的乱数
+  const arr = new Uint32Array(1);
+  const limit = Math.floor(0xFFFFFFFF / max) * max;
+  let v;
+  do { window.crypto.getRandomValues(arr); v = arr[0]; } while (v >= limit);
+  return v % max;
+}
+
+function buildPool(){
+  let lower = 'abcdefghijklmnopqrstuvwxyz';
+  let upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let number = '0123456789';
+  let symbol = '!@#$%^&*()-_=+[]{};:,.?';
+  if (document.getElementById('noambig').checked) {
+    const ambig = /[lI1O0]/g;
+    lower = lower.replace(ambig, '');
+    upper = upper.replace(ambig, '');
+    number = number.replace(ambig, '');
+  }
+  let pool = '';
+  if (document.getElementById('lower').checked) pool += lower;
+  if (document.getElementById('upper').checked) pool += upper;
+  if (document.getElementById('number').checked) pool += number;
+  if (document.getElementById('symbol').checked) pool += symbol;
+  return pool;
+}
+
+function strengthLabel(len, kinds){
+  const score = len * kinds;
+  if (score >= 64) return '非常に強い';
+  if (score >= 48) return '強い';
+  if (score >= 32) return 'まあまあ';
+  return '弱い（長くするのがおすすめ）';
+}
+
+document.getElementById('gen').addEventListener('click', function(){
+  const pool = buildPool();
+  if (pool.length === 0) { alert('文字種を1つ以上選んでください'); return; }
+  const len = parseInt(lenEl.value, 10);
+  let pw = '';
+  for (let i = 0; i < len; i++) { pw += pool[randInt(pool.length)]; }
+
+  const kinds = ['lower','upper','number','symbol'].filter(function(id){ return document.getElementById(id).checked; }).length;
+  document.getElementById('pw').textContent = pw;
+  document.getElementById('strength').textContent = strengthLabel(len, kinds);
+  document.getElementById('result').hidden = false;
+});
+
+document.getElementById('copy').addEventListener('click', function(){
+  const pw = document.getElementById('pw').textContent;
+  if (!pw || pw === '—') return;
+  navigator.clipboard.writeText(pw).then(function(){
+    const btn = document.getElementById('copy');
+    const orig = btn.textContent;
+    btn.textContent = 'コピーしました！';
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  });
+});
+</script>
+</body>
+</html>

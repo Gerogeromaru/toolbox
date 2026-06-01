@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>睡眠時間計算ツール（最適な就寝・起床時刻を逆算）| Toolbox</title>
+<meta name="description" content="起きたい時刻や寝る時刻を入力すると、90分の睡眠サイクルに合わせたおすすめの就寝・起床時刻を提案。すっきり起きたい人向けの会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/sleep/">
+<meta property="og:title" content="睡眠時間計算ツール（最適な就寝・起床時刻を逆算）">
+<meta property="og:description" content="90分サイクルに合わせた就寝・起床時刻を提案する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/sleep/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>睡眠時間計算ツール</h1>
+  <p class="lead">睡眠は約90分周期で浅い眠りと深い眠りを繰り返します。サイクルの切れ目で起きると目覚めがすっきりしやすいとされています。<strong>おすすめの就寝・起床時刻</strong>を逆算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="mode">計算の種類</label>
+      <select id="mode">
+        <option value="wake" selected>○時に起きたい → 寝る時刻</option>
+        <option value="sleep">今／○時に寝る → 起きる時刻</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="time" id="time-label">起きたい時刻</label>
+      <input type="time" id="time">
+    </div>
+    <button class="primary" id="calc">おすすめ時刻を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub" id="out-label">おすすめの時刻</p>
+      <table class="breakdown" id="out-table"></table>
+      <p class="sub">※ 入眠までの目安として約14分を加味しています。上のほうが睡眠時間が長くなります。</p>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>90分サイクルの考え方</h2>
+  <p>人の睡眠は「レム睡眠（浅い）」と「ノンレム睡眠（深い）」を約90分周期で繰り返します。深い眠りの途中で起こされると寝起きがつらく、浅い眠りのタイミングで起きると比較的すっきり目覚めやすいといわれます。そのため、就寝から90分の倍数（4.5・6・7.5・9時間）で起きるのがひとつの目安です。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>必ずすっきり起きられますか？</dt>
+    <dd>睡眠サイクルには個人差があり、ちょうど90分とは限りません。あくまで目安としてご活用ください。</dd>
+    <dt>理想の睡眠時間は？</dt>
+    <dd>成人では一般に6〜8時間（サイクル4〜5回）が目安とされますが、必要な睡眠時間は人それぞれです。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールは一般的な睡眠サイクルに基づく目安であり、医学的な助言ではありません。睡眠の悩みが続く場合は医療機関にご相談ください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+const FALL_ASLEEP = 14; // 入眠までの目安（分）
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function fmt(d){ return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+
+const modeEl = document.getElementById('mode');
+const timeLabel = document.getElementById('time-label');
+modeEl.addEventListener('change', function(){
+  timeLabel.textContent = this.value === 'wake' ? '起きたい時刻' : '寝る時刻';
+  document.getElementById('result').hidden = true;
+});
+
+document.getElementById('calc').addEventListener('click', function(){
+  const t = document.getElementById('time').value;
+  if (!t) { alert('時刻を入力してください'); return; }
+  const parts = t.split(':');
+  const base = new Date();
+  base.setHours(parseInt(parts[0],10), parseInt(parts[1],10), 0, 0);
+
+  const out = document.getElementById('out-table');
+  out.innerHTML = '';
+  const cycles = [6, 5, 4, 3]; // 9h, 7.5h, 6h, 4.5h
+  const isWake = modeEl.value === 'wake';
+
+  document.getElementById('out-label').textContent = isWake ? 'この時刻に寝るのがおすすめ' : 'この時刻に起きるのがおすすめ';
+
+  cycles.forEach(function(c){
+    const minutes = c * 90;
+    const d = new Date(base.getTime());
+    if (isWake) {
+      // 起床時刻から逆算（睡眠 + 入眠時間 だけ前に寝る）
+      d.setMinutes(d.getMinutes() - minutes - FALL_ASLEEP);
+    } else {
+      // 就寝時刻から（入眠 + 睡眠）後に起きる
+      d.setMinutes(d.getMinutes() + minutes + FALL_ASLEEP);
+    }
+    const hLabel = (minutes/60) + '時間（' + c + 'サイクル）';
+    const tr = out.insertRow();
+    tr.innerHTML = '<th>' + fmt(d) + '</th><td class="num">睡眠' + hLabel + '</td>';
+  });
+
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

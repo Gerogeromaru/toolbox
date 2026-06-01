@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チップ計算ツール（海外の飲食代＋チップを自動計算）| Toolbox</title>
+<meta name="description" content="飲食代とチップ率、人数を入力するだけで、チップ額・合計額・1人あたりの支払いを自動計算。海外旅行のレストランで便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/tip/">
+<meta property="og:title" content="チップ計算ツール（海外の飲食代＋チップを自動計算）">
+<meta property="og:description" content="飲食代とチップ率からチップ額・合計・1人あたりを計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/tip/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>チップ計算ツール</h1>
+  <p class="lead">飲食代とチップ率、人数を入力すると、<strong>チップ額・合計額・1人あたりの支払い</strong>を自動で計算します。海外のレストランでどうぞ。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="bill">飲食代（チップ前）</label>
+      <input type="number" id="bill" inputmode="decimal" placeholder="例：80" min="0" step="any">
+      <div class="hint">通貨は問いません（ドルでもユーロでも同じ数値で計算します）。</div>
+    </div>
+    <div class="row">
+      <label for="rate">チップ率（%）</label>
+      <select id="rate">
+        <option value="10">10%</option>
+        <option value="15" selected>15%（標準的）</option>
+        <option value="18">18%</option>
+        <option value="20">20%（手厚め）</option>
+        <option value="custom">カスタム…</option>
+      </select>
+    </div>
+    <div class="row" id="custom-row" hidden>
+      <label for="customRate">カスタムのチップ率（%）</label>
+      <input type="number" id="customRate" inputmode="decimal" placeholder="例：17" min="0" step="any">
+    </div>
+    <div class="row">
+      <label for="people">割り勘人数（任意）</label>
+      <input type="number" id="people" inputmode="numeric" placeholder="例：4" min="1" step="1">
+    </div>
+    <button class="primary" id="calc">チップを計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">合計（飲食代＋チップ）</p>
+      <div class="big" id="total">—</div>
+      <table class="breakdown">
+        <tr><th>飲食代</th><td class="num" id="r-bill"></td></tr>
+        <tr><th>チップ</th><td class="num" id="r-tip"></td></tr>
+        <tr><th>合計</th><td class="num" id="r-total"></td></tr>
+        <tr id="row-per" hidden><th>1人あたり</th><td class="num" id="r-per"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>国・場面別のチップの目安</h2>
+  <table class="breakdown">
+    <tr><th>アメリカ（レストラン）</th><td>15〜20%が一般的</td></tr>
+    <tr><th>カフェ・テイクアウト</th><td>不要〜数%（任意）</td></tr>
+    <tr><th>タクシー</th><td>10〜15%程度</td></tr>
+    <tr><th>日本・多くのアジア圏</th><td>基本的にチップ文化なし</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>チップは税抜・税込どちらにかける？</dt>
+    <dd>一般には税抜（料理・飲み物の小計）に対してかけるのが基本ですが、税込の合計にかけても問題ありません。本ツールは入力した金額にそのまま率をかけます。</dd>
+    <dt>サービス料が含まれている場合は？</dt>
+    <dd>伝票に「Service charge」「Gratuity included」とあれば、追加のチップは原則不要です。</dd>
+  </dl>
+
+  <p class="disclaimer">※ チップの相場は国・地域・店の格により異なります。本ツールは計算の目安です。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function money(n){ return n.toLocaleString('ja-JP', { maximumFractionDigits: 2 }); }
+
+const rateEl = document.getElementById('rate');
+rateEl.addEventListener('change', function(){
+  document.getElementById('custom-row').hidden = this.value !== 'custom';
+});
+
+document.getElementById('calc').addEventListener('click', function(){
+  const bill = parseFloat(document.getElementById('bill').value);
+  if (!(bill > 0)) { alert('飲食代を入力してください'); return; }
+  let rate;
+  if (rateEl.value === 'custom') {
+    rate = parseFloat(document.getElementById('customRate').value);
+    if (isNaN(rate) || rate < 0) { alert('カスタムのチップ率を入力してください'); return; }
+  } else {
+    rate = parseFloat(rateEl.value);
+  }
+
+  const tip = bill * rate / 100;
+  const total = bill + tip;
+
+  document.getElementById('total').textContent = money(total);
+  document.getElementById('r-bill').textContent = money(bill);
+  document.getElementById('r-tip').textContent = money(tip) + '（' + rate + '%）';
+  document.getElementById('r-total').textContent = money(total);
+
+  const people = parseInt(document.getElementById('people').value, 10);
+  const rowPer = document.getElementById('row-per');
+  if (people && people > 0) {
+    document.getElementById('r-per').textContent = money(total / people) + '（' + people + '人）';
+    rowPer.hidden = false;
+  } else {
+    rowPer.hidden = true;
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

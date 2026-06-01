@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>運動の消費カロリー計算ツール（METsで運動量を算出）| Toolbox</title>
+<meta name="description" content="体重・運動の種類・時間を選ぶだけで、消費カロリーをMETs（メッツ）で自動計算。ウォーキングやジョギングなどの運動量の目安に。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/calorie-burn/">
+<meta property="og:title" content="運動の消費カロリー計算ツール（METsで運動量を算出）">
+<meta property="og:description" content="体重・運動・時間から消費カロリーをMETsで計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/calorie-burn/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>運動の消費カロリー計算ツール</h1>
+  <p class="lead">体重・運動の種類・時間を選ぶと、<strong>消費カロリー</strong>をMETs（メッツ）を用いて自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="weight">体重（kg）</label>
+      <input type="number" id="weight" inputmode="decimal" placeholder="例：60" min="0" step="0.1">
+    </div>
+    <div class="row">
+      <label for="mets">運動の種類</label>
+      <select id="mets">
+        <option value="2.5">ヨガ・ストレッチ（2.5METs）</option>
+        <option value="3.3">掃除・家事（3.3METs）</option>
+        <option value="3.5" selected>ウォーキング・速歩（3.5METs）</option>
+        <option value="4.0">軽い筋トレ（4.0METs）</option>
+        <option value="6.0">サイクリング（6.0METs）</option>
+        <option value="7.0">ジョギング・テニス（7.0METs）</option>
+        <option value="8.0">水泳・階段昇降（8.0METs）</option>
+        <option value="9.8">ランニング（速め・9.8METs）</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="minutes">運動時間（分）</label>
+      <input type="number" id="minutes" inputmode="numeric" placeholder="例：30" min="0" step="1">
+    </div>
+    <button class="primary" id="calc">消費カロリーを計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">消費カロリー（概算）</p>
+      <div class="big" id="kcal">—</div>
+      <table class="breakdown">
+        <tr><th>消費カロリー</th><td class="num" id="r-kcal"></td></tr>
+        <tr><th>ごはん換算（茶碗1杯≒240kcal）</th><td class="num" id="r-rice"></td></tr>
+        <tr><th>脂肪換算（脂肪1kg≒7200kcal）</th><td class="num" id="r-fat"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>計算方法（METs法）</h2>
+  <p>消費カロリーは <strong>METs × 体重(kg) × 時間(h) × 1.05</strong> で求めます。METs（メッツ）は安静時を1とした運動強度の指標で、数値が大きいほど消費カロリーも大きくなります。</p>
+
+  <h2>主な運動のMETsの目安</h2>
+  <table class="breakdown">
+    <tr><th>ウォーキング（普通）</th><td>約3.0〜3.5METs</td></tr>
+    <tr><th>ジョギング</th><td>約7.0METs</td></tr>
+    <tr><th>ランニング（速め）</th><td>約9〜11METs</td></tr>
+    <tr><th>水泳（クロール）</th><td>約8〜10METs</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>表示は「運動による消費」だけですか？</dt>
+    <dd>はい。安静時にも消費される基礎代謝分は含みません。1日の総消費は<a href="../bmr/">基礎代謝・必要カロリー計算</a>を併せてご利用ください。</dd>
+    <dt>同じ運動でも人によって違う？</dt>
+    <dd>体重が重いほど消費カロリーは大きくなります。筋肉量やフォームによっても実際の消費は変わるため、目安としてご利用ください。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は概算であり、医学的・栄養学的な精度を保証するものではありません。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function kcalFmt(n){ return Math.round(n).toLocaleString('ja-JP') + ' kcal'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const weight = parseFloat(document.getElementById('weight').value);
+  const mets = parseFloat(document.getElementById('mets').value);
+  const minutes = parseFloat(document.getElementById('minutes').value);
+  if (!(weight > 0)) { alert('体重を入力してください'); return; }
+  if (!(minutes > 0)) { alert('運動時間を入力してください'); return; }
+
+  const hours = minutes / 60;
+  const kcal = mets * weight * hours * 1.05;
+
+  document.getElementById('kcal').textContent = kcalFmt(kcal);
+  document.getElementById('r-kcal').textContent = kcalFmt(kcal);
+  document.getElementById('r-rice').textContent = (kcal / 240).toFixed(1) + ' 杯分';
+  document.getElementById('r-fat').textContent = (kcal / 7200 * 1000).toFixed(0) + ' g分';
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

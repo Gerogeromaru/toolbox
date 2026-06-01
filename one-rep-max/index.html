@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1RM計算ツール（筋トレの最大挙上重量を推定）| Toolbox</title>
+<meta name="description" content="扱った重量と回数を入力するだけで、1RM（最大挙上重量）の推定値と、各回数・各％に対応するトレーニング重量の目安を自動計算。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/one-rep-max/">
+<meta property="og:title" content="1RM計算ツール（筋トレの最大挙上重量を推定）">
+<meta property="og:description" content="重量と回数から1RM（最大挙上重量）と目標重量を推定する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/one-rep-max/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>1RM計算ツール（最大挙上重量）</h1>
+  <p class="lead">扱った重量と反復回数を入力すると、<strong>1RM（1回だけ挙げられる最大重量）</strong>の推定値と、目的別のトレーニング重量の目安を計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="weight">扱った重量（kg）</label>
+      <input type="number" id="weight" inputmode="decimal" placeholder="例：80" min="0" step="0.5">
+    </div>
+    <div class="row">
+      <label for="reps">反復回数（レップ数）</label>
+      <input type="number" id="reps" inputmode="numeric" placeholder="例：8" min="1" max="15" step="1">
+      <div class="hint">限界まで（あと0〜1回が限界）の回数で入力すると精度が上がります。10回以内が目安。</div>
+    </div>
+    <button class="primary" id="calc">1RMを計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">推定1RM（最大挙上重量）</p>
+      <div class="big" id="onerm">—</div>
+      <table class="breakdown" id="pct-table">
+        <tr><th>目的</th><th class="num">重量の目安</th></tr>
+        <!-- rows injected -->
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>計算方法</h2>
+  <p>本ツールはエプリー式 <strong>1RM ＝ 重量 ×(1＋回数÷30)</strong> で推定しています。1RMは怪我のリスクが高いため、実測せずに推定値で管理するのが安全とされています。</p>
+
+  <h2>目的別の負荷の目安</h2>
+  <table class="breakdown">
+    <tr><th>筋力アップ</th><td>1RMの85〜95%（低回数）</td></tr>
+    <tr><th>筋肥大</th><td>1RMの67〜80%（中回数）</td></tr>
+    <tr><th>筋持久力</th><td>1RMの〜67%（高回数）</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>何回くらいで測るのが正確？</dt>
+    <dd>推定式は反復回数が少ない（おおむね10回以内）ほど精度が高くなります。20回などの高回数では誤差が大きくなります。</dd>
+    <dt>本当に1RMに挑戦してもいい？</dt>
+    <dd>最大重量への挑戦は怪我のリスクが高く、十分な経験・補助者・ウォームアップが必要です。初心者は推定値の利用をおすすめします。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの結果は推定値です。トレーニングは無理のない範囲で、必要に応じて専門家の指導を受けてください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function kg(n){ return (Math.round(n * 2) / 2).toLocaleString('ja-JP') + ' kg'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const w = parseFloat(document.getElementById('weight').value);
+  const reps = parseInt(document.getElementById('reps').value, 10);
+  if (!(w > 0)) { alert('重量を入力してください'); return; }
+  if (!(reps >= 1)) { alert('回数を入力してください'); return; }
+
+  const onerm = w * (1 + reps / 30);
+  document.getElementById('onerm').textContent = kg(onerm);
+
+  const rows = [
+    ['筋力（90%）', 0.90],
+    ['筋力（85%）', 0.85],
+    ['筋肥大（80%）', 0.80],
+    ['筋肥大（75%）', 0.75],
+    ['筋肥大（70%）', 0.70],
+    ['筋持久力（60%）', 0.60]
+  ];
+  const table = document.getElementById('pct-table');
+  while (table.rows.length > 1) { table.deleteRow(1); }
+  rows.forEach(function(r){
+    const tr = table.insertRow();
+    tr.innerHTML = '<th>' + r[0] + '</th><td class="num">' + kg(onerm * r[1]) + '</td>';
+  });
+
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

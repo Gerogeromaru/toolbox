@@ -121,6 +121,46 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://gerogeromaru.github.io/toolbox/worktime/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/tip/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/area-jp/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/cooking/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/pace/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/calorie-burn/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/one-rep-max/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/ideal-weight/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/base-convert/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/random-picker/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://gerogeromaru.github.io/toolbox/privacy/</loc>
     <changefreq>yearly</changefreq>
   </url>

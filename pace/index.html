@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ランニングペース計算ツール（距離とタイムからペースを算出）| Toolbox</title>
+<meta name="description" content="距離と走ったタイムを入力するだけで、1kmあたりのペースや時速、5km・10km・ハーフ・フルマラソンの予想タイムを自動計算。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/pace/">
+<meta property="og:title" content="ランニングペース計算ツール（距離とタイムからペースを算出）">
+<meta property="og:description" content="距離とタイムからペース・時速・各距離の予想タイムを計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/pace/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>ランニングペース計算ツール</h1>
+  <p class="lead">距離と走ったタイムを入力すると、<strong>1kmあたりのペース・時速</strong>と、各レース距離の予想タイムを自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="distance">距離（km）</label>
+      <input type="number" id="distance" inputmode="decimal" placeholder="例：5" min="0" step="any">
+    </div>
+    <label>タイム</label>
+    <div class="row" style="display:flex; gap:8px;">
+      <input type="number" id="h" inputmode="numeric" placeholder="時" min="0" step="1">
+      <input type="number" id="m" inputmode="numeric" placeholder="分" min="0" max="59" step="1">
+      <input type="number" id="s" inputmode="numeric" placeholder="秒" min="0" max="59" step="1">
+    </div>
+    <button class="primary" id="calc" style="margin-top:8px;">ペースを計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">1kmあたりのペース</p>
+      <div class="big" id="pace">—</div>
+      <table class="breakdown">
+        <tr><th>ペース</th><td class="num" id="r-pace"></td></tr>
+        <tr><th>時速</th><td class="num" id="r-speed"></td></tr>
+        <tr><th>5km 予想タイム</th><td class="num" id="r-5k"></td></tr>
+        <tr><th>10km 予想タイム</th><td class="num" id="r-10k"></td></tr>
+        <tr><th>ハーフ（21.0975km）</th><td class="num" id="r-half"></td></tr>
+        <tr><th>フル（42.195km）</th><td class="num" id="r-full"></td></tr>
+      </table>
+      <p class="sub">※ 予想タイムは同じペースを維持した場合の単純計算です。</p>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>ペースの目安</h2>
+  <table class="breakdown">
+    <tr><th>ゆっくりジョグ</th><td>7〜8分/km</td></tr>
+    <tr><th>市民ランナーの巡航</th><td>5〜6分/km</td></tr>
+    <tr><th>サブ4（フル4時間切り）</th><td>約5分41秒/km</td></tr>
+    <tr><th>サブ3（フル3時間切り）</th><td>約4分15秒/km</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>ペース（分/km）と時速はどう違う？</dt>
+    <dd>ペースは「1kmを何分で走るか」、時速は「1時間で何km進むか」です。たとえば6分/kmは時速10kmにあたります。</dd>
+    <dt>予想タイムは正確ですか？</dt>
+    <dd>同じペースを保った場合の理論値です。距離が伸びるほど実際はペースが落ちやすいため、長距離の予想は余裕を見てください。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの予想タイムは目安です。体調・コース・気象条件で実際のタイムは変わります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function fmtTime(totalSec){
+  totalSec = Math.round(totalSec);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const pad = function(n){ return (n < 10 ? '0' : '') + n; };
+  return (h > 0 ? h + ':' + pad(m) : m) + ':' + pad(s);
+}
+function fmtPace(secPerKm){
+  const m = Math.floor(secPerKm / 60);
+  const s = Math.round(secPerKm % 60);
+  const pad = function(n){ return (n < 10 ? '0' : '') + n; };
+  return m + '分' + pad(s) + '秒/km';
+}
+
+document.getElementById('calc').addEventListener('click', function(){
+  const distance = parseFloat(document.getElementById('distance').value);
+  const h = parseInt(document.getElementById('h').value, 10) || 0;
+  const m = parseInt(document.getElementById('m').value, 10) || 0;
+  const s = parseInt(document.getElementById('s').value, 10) || 0;
+  const totalSec = h * 3600 + m * 60 + s;
+  if (!(distance > 0)) { alert('距離を入力してください'); return; }
+  if (totalSec <= 0) { alert('タイムを入力してください'); return; }
+
+  const secPerKm = totalSec / distance;
+  const speed = 3600 / secPerKm; // km/h
+
+  document.getElementById('pace').textContent = fmtPace(secPerKm);
+  document.getElementById('r-pace').textContent = fmtPace(secPerKm);
+  document.getElementById('r-speed').textContent = speed.toFixed(2) + ' km/h';
+  document.getElementById('r-5k').textContent = fmtTime(secPerKm * 5);
+  document.getElementById('r-10k').textContent = fmtTime(secPerKm * 10);
+  document.getElementById('r-half').textContent = fmtTime(secPerKm * 21.0975);
+  document.getElementById('r-full').textContent = fmtTime(secPerKm * 42.195);
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

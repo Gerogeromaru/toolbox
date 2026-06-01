@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ランダム抽選ツール（リストから当選者をくじ引き）| Toolbox</title>
+<meta name="description" content="名前や項目を1行ずつ入力するだけで、ランダムに当選者を選ぶ抽選・くじ引きツール。プレゼント企画や順番決めに便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/random-picker/">
+<meta property="og:title" content="ランダム抽選ツール（リストから当選者をくじ引き）">
+<meta property="og:description" content="リストからランダムに当選者を選ぶ抽選・くじ引きツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/random-picker/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>ランダム抽選ツール</h1>
+  <p class="lead">名前や項目を1行ずつ入力して、<strong>ランダムに当選者を選びます</strong>。プレゼント企画・順番決め・席替えなどにどうぞ。処理はブラウザ内で完結します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="list">候補（1行に1つ）</label>
+      <textarea id="list" placeholder="山田&#10;佐藤&#10;鈴木&#10;田中"></textarea>
+    </div>
+    <div class="row">
+      <label for="count">選ぶ人数</label>
+      <input type="number" id="count" inputmode="numeric" placeholder="例：1" min="1" step="1" value="1">
+    </div>
+    <button class="primary" id="pick">抽選する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">当選</p>
+      <div class="big" id="winner">—</div>
+      <p class="sub" id="note"></p>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>使い方</h2>
+  <ul>
+    <li>候補欄に、当選候補を改行で区切って入力します</li>
+    <li>選ぶ人数を指定して「抽選する」を押すだけ</li>
+    <li>同じ人が重複して選ばれることはありません（重複なし抽選）</li>
+  </ul>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>抽選は公平ですか？</dt>
+    <dd>ブラウザの暗号学的乱数（Web Crypto API）を用い、各候補が等しい確率で選ばれるようにしています。</dd>
+    <dt>入力した名前は保存されますか？</dt>
+    <dd>いいえ。すべてブラウザ内で処理され、サーバーへの送信・保存は行いません。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 公式な抽選・くじには、主催者の定める正規の方法をご利用ください。本ツールはカジュアルな用途向けです。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function randInt(max){
+  const arr = new Uint32Array(1);
+  const limit = Math.floor(0xFFFFFFFF / max) * max;
+  let v;
+  do { window.crypto.getRandomValues(arr); v = arr[0]; } while (v >= limit);
+  return v % max;
+}
+
+function shuffle(a){
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = randInt(i + 1);
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+document.getElementById('pick').addEventListener('click', function(){
+  const items = document.getElementById('list').value
+    .split('\n').map(function(s){ return s.trim(); }).filter(function(s){ return s !== ''; });
+  let count = parseInt(document.getElementById('count').value, 10);
+  if (items.length === 0) { alert('候補を1つ以上入力してください'); return; }
+  if (!(count >= 1)) { count = 1; }
+
+  let note = '';
+  if (count > items.length) {
+    count = items.length;
+    note = '※ 候補が ' + items.length + ' 件のため、全員が当選しました。';
+  }
+
+  const winners = shuffle(items.slice()).slice(0, count);
+  document.getElementById('winner').textContent = winners.join('、');
+  document.getElementById('note').textContent =
+    note || (count + ' 名を ' + items.length + ' 件から抽選しました。');
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

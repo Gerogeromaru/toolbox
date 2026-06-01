@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>面積変換ツール（㎡・坪・畳をまとめて換算）| Toolbox</title>
+<meta name="description" content="平米（㎡）・坪・畳（帖）を入力するだけで相互に換算。賃貸や間取り、土地の広さの把握に便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/area-jp/">
+<meta property="og:title" content="面積変換ツール（㎡・坪・畳をまとめて換算）">
+<meta property="og:description" content="㎡・坪・畳を相互換算する無料ツール。賃貸や間取りの把握に。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/area-jp/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>面積変換ツール（㎡・坪・畳）</h1>
+  <p class="lead">平米（㎡）・坪・畳（帖）を相互に換算します。賃貸の広さや間取りのイメージづかみにどうぞ。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="value">面積の数値</label>
+      <input type="number" id="value" inputmode="decimal" placeholder="例：40" min="0" step="any">
+    </div>
+    <div class="row">
+      <label for="unit">入力した単位</label>
+      <select id="unit">
+        <option value="sqm" selected>㎡（平米）</option>
+        <option value="tsubo">坪</option>
+        <option value="jo">畳（帖）</option>
+      </select>
+    </div>
+    <button class="primary" id="calc">換算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">換算結果</p>
+      <div class="big" id="out">—</div>
+      <table class="breakdown">
+        <tr><th>㎡（平米）</th><td class="num" id="r-sqm"></td></tr>
+        <tr><th>坪</th><td class="num" id="r-tsubo"></td></tr>
+        <tr><th>畳（帖）</th><td class="num" id="r-jo"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>換算の基準</h2>
+  <table class="breakdown">
+    <tr><th>1坪</th><td>約3.305785 ㎡（畳およそ2枚分）</td></tr>
+    <tr><th>1畳（帖）</th><td>1.62 ㎡（不動産表示で用いられる換算）</td></tr>
+    <tr><th>1坪</th><td>約2.0405 畳</td></tr>
+  </table>
+
+  <h2>広さのイメージ</h2>
+  <table class="breakdown">
+    <tr><th>ワンルーム</th><td>20〜25㎡（約6〜8坪・約12〜15畳）</td></tr>
+    <tr><th>1LDK</th><td>40〜50㎡前後</td></tr>
+    <tr><th>ファミリー向け 3LDK</th><td>60〜80㎡前後</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>畳の大きさは地域で違うのでは？</dt>
+    <dd>はい。京間・中京間・江戸間などで実際の畳のサイズは異なります。本ツールは不動産公正競争規約で用いられる<strong>1畳＝1.62㎡</strong>で計算しています。</dd>
+    <dt>坪と㎡、どちらが正確？</dt>
+    <dd>面積として等価です。土地は坪、建物は㎡で表されることが多いだけで、相互に正確に変換できます。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 畳の換算（1.62㎡）は表示上の基準で、実際の畳サイズとは異なる場合があります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+const TSUBO = 400 / 121;   // 1坪の㎡（≒3.305785）
+const JO = 1.62;           // 1畳の㎡
+function num(n){ return parseFloat(n.toPrecision(6)).toLocaleString('ja-JP', { maximumFractionDigits: 3 }); }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const v = parseFloat(document.getElementById('value').value);
+  if (!(v >= 0) || isNaN(v)) { alert('面積の数値を入力してください'); return; }
+  const unit = document.getElementById('unit').value;
+
+  let sqm;
+  if (unit === 'sqm') sqm = v;
+  else if (unit === 'tsubo') sqm = v * TSUBO;
+  else sqm = v * JO;
+
+  const tsubo = sqm / TSUBO;
+  const jo = sqm / JO;
+
+  document.getElementById('out').textContent = num(sqm) + ' ㎡';
+  document.getElementById('r-sqm').textContent = num(sqm) + ' ㎡';
+  document.getElementById('r-tsubo').textContent = num(tsubo) + ' 坪';
+  document.getElementById('r-jo').textContent = num(jo) + ' 畳';
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

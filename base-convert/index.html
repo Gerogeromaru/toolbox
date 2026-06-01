@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>進数変換ツール（2進数・10進数・16進数をまとめて変換）| Toolbox</title>
+<meta name="description" content="数値を入力するだけで、2進数・8進数・10進数・16進数を相互に変換。プログラミングやIT学習に便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/base-convert/">
+<meta property="og:title" content="進数変換ツール（2進数・10進数・16進数をまとめて変換）">
+<meta property="og:description" content="2進数・8進数・10進数・16進数を相互変換する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/base-convert/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>進数変換ツール</h1>
+  <p class="lead">数値を入力すると、<strong>2進数・8進数・10進数・16進数</strong>を相互に変換します。プログラミングやIT資格の学習にどうぞ。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="value">変換する値</label>
+      <input type="text" id="value" placeholder="例：255 / FF / 11111111">
+    </div>
+    <div class="row">
+      <label for="from">入力した値の進数</label>
+      <select id="from">
+        <option value="10" selected>10進数（0-9）</option>
+        <option value="2">2進数（0-1）</option>
+        <option value="8">8進数（0-7）</option>
+        <option value="16">16進数（0-9, A-F）</option>
+      </select>
+    </div>
+    <button class="primary" id="calc">変換する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">10進数</p>
+      <div class="big" id="dec">—</div>
+      <table class="breakdown">
+        <tr><th>2進数</th><td class="num" id="r-bin"></td></tr>
+        <tr><th>8進数</th><td class="num" id="r-oct"></td></tr>
+        <tr><th>10進数</th><td class="num" id="r-dec"></td></tr>
+        <tr><th>16進数</th><td class="num" id="r-hex"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>進数の基礎</h2>
+  <table class="breakdown">
+    <tr><th>2進数</th><td>0と1だけで表す。コンピュータ内部の基本</td></tr>
+    <tr><th>8進数</th><td>0〜7で表す</td></tr>
+    <tr><th>10進数</th><td>0〜9で表す。私たちが普段使う数</td></tr>
+    <tr><th>16進数</th><td>0〜9とA〜Fで表す。色コードやメモリ表記に使用</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>小数や負の数は変換できますか？</dt>
+    <dd>本ツールは0以上の整数のみに対応しています。</dd>
+    <dt>とても大きな数も正確ですか？</dt>
+    <dd>非常に大きな桁の数値は、計算精度の都合で誤差が出る場合があります。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールは0以上の整数を対象としています。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+const patterns = {
+  '2': /^[01]+$/,
+  '8': /^[0-7]+$/,
+  '10': /^[0-9]+$/,
+  '16': /^[0-9a-fA-F]+$/
+};
+
+document.getElementById('calc').addEventListener('click', function(){
+  const raw = document.getElementById('value').value.trim().replace(/\s/g, '');
+  const from = document.getElementById('from').value;
+  if (!raw) { alert('変換する値を入力してください'); return; }
+  if (!patterns[from].test(raw)) {
+    alert('選んだ進数で使えない文字が含まれています');
+    return;
+  }
+
+  const dec = parseInt(raw, parseInt(from, 10));
+  if (isNaN(dec)) { alert('変換できませんでした'); return; }
+
+  document.getElementById('dec').textContent = dec.toLocaleString('ja-JP');
+  document.getElementById('r-bin').textContent = dec.toString(2);
+  document.getElementById('r-oct').textContent = dec.toString(8);
+  document.getElementById('r-dec').textContent = dec.toString(10);
+  document.getElementById('r-hex').textContent = dec.toString(16).toUpperCase();
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

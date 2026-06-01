@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>理想体重計算ツール（標準・美容・モデル体重を身長から）| Toolbox</title>
+<meta name="description" content="身長を入力するだけで、標準体重・美容体重・シンデレラ体重・モデル体重の目安を自動計算。ダイエットの目標設定に。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/ideal-weight/">
+<meta property="og:title" content="理想体重計算ツール（標準・美容・モデル体重を身長から）">
+<meta property="og:description" content="身長から標準・美容・シンデレラ・モデル体重の目安を計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/ideal-weight/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>理想体重計算ツール</h1>
+  <p class="lead">身長を入力すると、<strong>標準体重・美容体重・シンデレラ体重・モデル体重</strong>の目安を自動で計算します。ダイエットの目標設定にどうぞ。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="height">身長（cm）</label>
+      <input type="number" id="height" inputmode="decimal" placeholder="例：160" min="0" step="0.1">
+    </div>
+    <button class="primary" id="calc">理想体重を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">標準体重（最も健康的とされる体重）</p>
+      <div class="big" id="standard">—</div>
+      <table class="breakdown">
+        <tr><th>標準体重（BMI22）</th><td class="num" id="r-standard"></td></tr>
+        <tr><th>美容体重（BMI20）</th><td class="num" id="r-beauty"></td></tr>
+        <tr><th>シンデレラ体重（BMI18）</th><td class="num" id="r-cinderella"></td></tr>
+        <tr><th>モデル体重（BMI17）</th><td class="num" id="r-model"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>それぞれの体重の意味</h2>
+  <table class="breakdown">
+    <tr><th>標準体重</th><td>BMI22。統計的に最も病気になりにくいとされる体重</td></tr>
+    <tr><th>美容体重</th><td>BMI20。見た目がスリムに見えやすいとされる目安</td></tr>
+    <tr><th>シンデレラ体重</th><td>BMI18前後。かなり細身の目安</td></tr>
+    <tr><th>モデル体重</th><td>BMI17前後。ファッションモデル並みの細さの目安</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>美容・モデル体重を目指して大丈夫？</dt>
+    <dd>BMI18.5未満は「低体重（やせ）」に分類され、健康面のリスクもあります。極端な減量は避け、健康を最優先にしてください。</dd>
+    <dt>計算式は？</dt>
+    <dd>各体重 ＝ 身長(m) × 身長(m) × 目標BMI で求めています。現在のBMIは<a href="../bmi/">BMI計算ツール</a>で確認できます。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの結果は一般的な目安であり、医学的な推奨体重ではありません。体型には個人差があり、健康的な体重は人により異なります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function kg(n){ return n.toFixed(1) + ' kg'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const cm = parseFloat(document.getElementById('height').value);
+  if (!(cm > 0)) { alert('身長を入力してください'); return; }
+  const m = cm / 100;
+  const base = m * m;
+
+  document.getElementById('standard').textContent = kg(base * 22);
+  document.getElementById('r-standard').textContent = kg(base * 22);
+  document.getElementById('r-beauty').textContent = kg(base * 20);
+  document.getElementById('r-cinderella').textContent = kg(base * 18);
+  document.getElementById('r-model').textContent = kg(base * 17);
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

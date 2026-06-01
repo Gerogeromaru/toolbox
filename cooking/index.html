@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>料理の計量換算ツール（大さじ・小さじ・カップ・cc・g）| Toolbox</title>
+<meta name="description" content="大さじ・小さじ・カップ・cc(ml)を相互に換算。さらに調味料を選べばグラム(g)の目安も表示。レシピの単位変換に便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/cooking/">
+<meta property="og:title" content="料理の計量換算ツール（大さじ・小さじ・カップ・cc・g）">
+<meta property="og:description" content="大さじ・小さじ・カップ・ccを換算し、調味料のグラム目安も表示する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/cooking/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>料理の計量換算ツール</h1>
+  <p class="lead">大さじ・小さじ・カップ・cc（ml）を相互に換算します。調味料を選べば<strong>グラム(g)の目安</strong>も表示します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="value">量</label>
+      <input type="number" id="value" inputmode="decimal" placeholder="例：2" min="0" step="any">
+    </div>
+    <div class="row">
+      <label for="unit">単位</label>
+      <select id="unit">
+        <option value="15" selected>大さじ（15ml）</option>
+        <option value="5">小さじ（5ml）</option>
+        <option value="200">カップ（200ml）</option>
+        <option value="1">cc / ml</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="ingredient">調味料（g換算用・任意）</label>
+      <select id="ingredient">
+        <option value="1.0" selected>水・牛乳・酢</option>
+        <option value="0.6">上白糖</option>
+        <option value="0.85">グラニュー糖</option>
+        <option value="1.2">塩</option>
+        <option value="0.6">小麦粉（薄力粉）</option>
+        <option value="1.2">しょうゆ・みりん・みそ</option>
+        <option value="0.8">サラダ油・バター</option>
+        <option value="0.55">片栗粉</option>
+        <option value="0.3">パン粉</option>
+      </select>
+    </div>
+    <button class="primary" id="calc">換算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">グラムの目安</p>
+      <div class="big" id="gram">—</div>
+      <table class="breakdown">
+        <tr><th>大さじ</th><td class="num" id="r-tbsp"></td></tr>
+        <tr><th>小さじ</th><td class="num" id="r-tsp"></td></tr>
+        <tr><th>カップ</th><td class="num" id="r-cup"></td></tr>
+        <tr><th>cc（ml）</th><td class="num" id="r-ml"></td></tr>
+        <tr><th>グラム（選んだ調味料）</th><td class="num" id="r-gram"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>計量の基本</h2>
+  <table class="breakdown">
+    <tr><th>大さじ1</th><td>15ml（＝小さじ3）</td></tr>
+    <tr><th>小さじ1</th><td>5ml</td></tr>
+    <tr><th>1カップ</th><td>200ml（日本の計量カップ）</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>グラム換算が他のレシピと少し違います。</dt>
+    <dd>調味料の重さは粒の細かさや製品により差があります。本ツールは一般的な目安値で計算しているため、±数gの誤差が出ることがあります。</dd>
+    <dt>アメリカの1カップ（240ml）には対応していますか？</dt>
+    <dd>本ツールは日本の1カップ＝200mlで計算しています。海外レシピでは240mlのことがあるためご注意ください。</dd>
+  </dl>
+
+  <p class="disclaimer">※ グラム表示は一般的な目安であり、製品や状態により実際の重さは異なります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function num(n){ return parseFloat(n.toPrecision(6)).toLocaleString('ja-JP', { maximumFractionDigits: 2 }); }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const v = parseFloat(document.getElementById('value').value);
+  if (!(v >= 0) || isNaN(v)) { alert('量を入力してください'); return; }
+  const unitMl = parseFloat(document.getElementById('unit').value);
+  const density = parseFloat(document.getElementById('ingredient').value);
+  const ingredientLabel = document.getElementById('ingredient').selectedOptions[0].textContent;
+
+  const ml = v * unitMl;
+  const gram = ml * density;
+
+  document.getElementById('gram').textContent = num(gram) + ' g';
+  document.getElementById('r-tbsp').textContent = num(ml / 15) + ' 杯';
+  document.getElementById('r-tsp').textContent = num(ml / 5) + ' 杯';
+  document.getElementById('r-cup').textContent = num(ml / 200) + ' 杯';
+  document.getElementById('r-ml').textContent = num(ml) + ' ml';
+  document.getElementById('r-gram').textContent = num(gram) + ' g（' + ingredientLabel + '）';
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

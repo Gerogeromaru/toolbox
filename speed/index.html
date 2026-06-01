@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>速度・距離・時間 計算ツール（2つ入力で残り1つを算出）| Toolbox</title>
+<meta name="description" content="速度・距離・時間のうち2つを入力すると、残りの1つを自動計算。移動の所要時間や平均速度の計算に便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/speed/">
+<meta property="og:title" content="速度・距離・時間 計算ツール">
+<meta property="og:description" content="速度・距離・時間のうち2つから残り1つを自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/speed/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>速度・距離・時間 計算ツール</h1>
+  <p class="lead">求めたい項目を選び、残り2つを入力すると<strong>速度・距離・時間</strong>のうち1つを自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="target">求めるもの</label>
+      <select id="target">
+        <option value="speed" selected>速度（km/h）</option>
+        <option value="distance">距離（km）</option>
+        <option value="time">時間</option>
+      </select>
+    </div>
+    <div class="row" id="row-speed">
+      <label for="speed">速度（km/h）</label>
+      <input type="number" id="speed" inputmode="decimal" placeholder="例：60" min="0" step="any">
+    </div>
+    <div class="row" id="row-distance">
+      <label for="distance">距離（km）</label>
+      <input type="number" id="distance" inputmode="decimal" placeholder="例：120" min="0" step="any">
+    </div>
+    <div class="row" id="row-time">
+      <label for="time">時間（時間・小数可）</label>
+      <input type="number" id="time" inputmode="decimal" placeholder="例：1.5（＝1時間30分）" min="0" step="any">
+    </div>
+    <button class="primary" id="calc">計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub" id="out-label">結果</p>
+      <div class="big" id="out">—</div>
+      <p class="sub" id="sub"></p>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>速度・距離・時間の関係</h2>
+  <table class="breakdown">
+    <tr><th>速度</th><td>距離 ÷ 時間</td></tr>
+    <tr><th>距離</th><td>速度 × 時間</td></tr>
+    <tr><th>時間</th><td>距離 ÷ 速度</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>時間は「1時間30分」のように入れられますか？</dt>
+    <dd>時間は小数で入力してください。30分は0.5、15分は0.25、1時間30分は1.5です。計算結果の時間は「○時間○分」でも表示します。</dd>
+    <dt>単位はkm固定ですか？</dt>
+    <dd>距離はkm、速度はkm/hで計算します。徒歩は時速約4〜5km、自転車は約15〜20kmが目安です。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は理論値です。実際の所要時間は信号・渋滞・休憩などで変わります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function num(n){ return parseFloat(n.toPrecision(8)).toLocaleString('ja-JP', { maximumFractionDigits: 4 }); }
+function hToHm(h){
+  const totalMin = Math.round(h * 60);
+  const hh = Math.floor(totalMin / 60);
+  const mm = totalMin % 60;
+  return hh + '時間' + mm + '分';
+}
+
+const targetEl = document.getElementById('target');
+function updateRows(){
+  const t = targetEl.value;
+  document.getElementById('row-speed').style.display = t === 'speed' ? 'none' : '';
+  document.getElementById('row-distance').style.display = t === 'distance' ? 'none' : '';
+  document.getElementById('row-time').style.display = t === 'time' ? 'none' : '';
+  document.getElementById('result').hidden = true;
+}
+targetEl.addEventListener('change', updateRows);
+updateRows();
+
+document.getElementById('calc').addEventListener('click', function(){
+  const t = targetEl.value;
+  const speed = parseFloat(document.getElementById('speed').value);
+  const distance = parseFloat(document.getElementById('distance').value);
+  const time = parseFloat(document.getElementById('time').value);
+  const out = document.getElementById('out');
+  const sub = document.getElementById('sub');
+  const label = document.getElementById('out-label');
+
+  if (t === 'speed') {
+    if (!(distance >= 0) || !(time > 0)) { alert('距離と時間（0より大）を入力してください'); return; }
+    const v = distance / time;
+    label.textContent = '速度';
+    out.textContent = num(v) + ' km/h';
+    sub.textContent = '距離 ' + num(distance) + 'km ÷ 時間 ' + num(time) + 'h';
+  } else if (t === 'distance') {
+    if (!(speed >= 0) || !(time >= 0)) { alert('速度と時間を入力してください'); return; }
+    const d = speed * time;
+    label.textContent = '距離';
+    out.textContent = num(d) + ' km';
+    sub.textContent = '速度 ' + num(speed) + 'km/h × 時間 ' + num(time) + 'h';
+  } else {
+    if (!(distance >= 0) || !(speed > 0)) { alert('距離と速度（0より大）を入力してください'); return; }
+    const h = distance / speed;
+    label.textContent = '時間';
+    out.textContent = num(h) + ' 時間';
+    sub.textContent = '＝ ' + hToHm(h) + '（距離 ' + num(distance) + 'km ÷ 速度 ' + num(speed) + 'km/h）';
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

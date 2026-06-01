@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>単位変換ツール（長さ・重さ・温度をまとめて変換）| Toolbox</title>
+<meta name="description" content="長さ・重さ・温度の単位を入力するだけで相互に変換。メートル⇔フィート、キロ⇔ポンド、摂氏⇔華氏などに対応した会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/unit/">
+<meta property="og:title" content="単位変換ツール（長さ・重さ・温度をまとめて変換）">
+<meta property="og:description" content="長さ・重さ・温度の単位を相互変換する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/unit/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>単位変換ツール</h1>
+  <p class="lead">長さ・重さ・温度の単位を相互に変換します。数値と単位を選ぶだけで、その場で結果が表示されます。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="category">変換の種類</label>
+      <select id="category">
+        <option value="length" selected>長さ</option>
+        <option value="weight">重さ</option>
+        <option value="temp">温度</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="value">変換する値</label>
+      <input type="number" id="value" inputmode="decimal" placeholder="例：100" step="any">
+    </div>
+    <div class="row">
+      <label for="from">変換元の単位</label>
+      <select id="from"></select>
+    </div>
+    <div class="row">
+      <label for="to">変換先の単位</label>
+      <select id="to"></select>
+    </div>
+    <button class="primary" id="calc">変換する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">変換結果</p>
+      <div class="big" id="out">—</div>
+      <p class="sub" id="formula"></p>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>主な換算の目安</h2>
+  <table class="breakdown">
+    <tr><th>1インチ</th><td>2.54 cm</td></tr>
+    <tr><th>1フィート</th><td>30.48 cm（12インチ）</td></tr>
+    <tr><th>1マイル</th><td>約1.609 km</td></tr>
+    <tr><th>1ポンド</th><td>約453.6 g</td></tr>
+    <tr><th>1オンス</th><td>約28.35 g</td></tr>
+    <tr><th>0℃</th><td>32℉</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>温度の変換式は？</dt>
+    <dd>摂氏→華氏は ℉＝℃×9/5＋32、華氏→摂氏は ℃＝(℉−32)×5/9 です。ケルビンは K＝℃＋273.15 で換算します。</dd>
+    <dt>表示される桁数は？</dt>
+    <dd>見やすさを優先し、最大6桁程度に丸めて表示しています。精密な計算が必要な場合は元の換算式をご利用ください。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの結果は表示桁数の都合で丸め誤差が生じる場合があります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+// 各単位の「基準単位への倍率」（長さ=メートル, 重さ=グラム）
+const UNITS = {
+  length: { base: 'm', items: {
+    'mm':0.001, 'cm':0.01, 'm':1, 'km':1000,
+    'インチ':0.0254, 'フィート':0.3048, 'ヤード':0.9144, 'マイル':1609.344
+  }},
+  weight: { base: 'g', items: {
+    'mg':0.001, 'g':1, 'kg':1000, 't（トン）':1000000,
+    'オンス':28.349523125, 'ポンド':453.59237
+  }},
+  temp: { items: { '℃（摂氏）':'C', '℉（華氏）':'F', 'K（ケルビン）':'K' } }
+};
+
+const catEl = document.getElementById('category');
+const fromEl = document.getElementById('from');
+const toEl = document.getElementById('to');
+
+function fillUnits(){
+  const cat = catEl.value;
+  const keys = Object.keys(UNITS[cat].items);
+  fromEl.innerHTML = '';
+  toEl.innerHTML = '';
+  keys.forEach(function(k){
+    fromEl.add(new Option(k, k));
+    toEl.add(new Option(k, k));
+  });
+  // 変換先は2番目をデフォルトに
+  toEl.selectedIndex = keys.length > 1 ? 1 : 0;
+}
+
+function toBaseTemp(v, unit){
+  if (unit === 'C') return v;
+  if (unit === 'F') return (v - 32) * 5 / 9;
+  return v - 273.15; // K
+}
+function fromBaseTemp(c, unit){
+  if (unit === 'C') return c;
+  if (unit === 'F') return c * 9 / 5 + 32;
+  return c + 273.15;
+}
+
+function round(n){
+  return parseFloat(n.toPrecision(7)).toLocaleString('ja-JP', { maximumFractionDigits: 6 });
+}
+
+catEl.addEventListener('change', fillUnits);
+fillUnits();
+
+document.getElementById('calc').addEventListener('click', function(){
+  const v = parseFloat(document.getElementById('value').value);
+  if (isNaN(v)) { alert('変換する値を入力してください'); return; }
+  const cat = catEl.value;
+  const fromKey = fromEl.value, toKey = toEl.value;
+
+  let result;
+  if (cat === 'temp') {
+    const c = toBaseTemp(v, UNITS.temp.items[fromKey]);
+    result = fromBaseTemp(c, UNITS.temp.items[toKey]);
+  } else {
+    const base = v * UNITS[cat].items[fromKey];
+    result = base / UNITS[cat].items[toKey];
+  }
+
+  document.getElementById('out').textContent = round(result) + ' ' + toKey;
+  document.getElementById('formula').textContent =
+    round(v) + ' ' + fromKey + ' ＝ ' + round(result) + ' ' + toKey;
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

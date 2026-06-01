@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ガソリン代・燃費計算ツール（走行距離から費用を概算）| Toolbox</title>
+<meta name="description" content="走行距離・燃費・ガソリン単価を入力するだけで、必要なガソリン量とガソリン代を自動計算。ドライブや帰省の費用見積もりに便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/fuel/">
+<meta property="og:title" content="ガソリン代・燃費計算ツール（走行距離から費用を概算）">
+<meta property="og:description" content="走行距離・燃費・単価からガソリン代を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/fuel/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>ガソリン代・燃費計算ツール</h1>
+  <p class="lead">走行距離・燃費・ガソリン単価を入力すると、<strong>必要なガソリン量とガソリン代</strong>の概算を自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="distance">走行距離（km）</label>
+      <input type="number" id="distance" inputmode="decimal" placeholder="例：300" min="0" step="any">
+    </div>
+    <div class="row">
+      <label for="mileage">燃費（km/L）</label>
+      <input type="number" id="mileage" inputmode="decimal" placeholder="例：15" min="0" step="any">
+    </div>
+    <div class="row">
+      <label for="price">ガソリン単価（円/L）</label>
+      <input type="number" id="price" inputmode="decimal" placeholder="例：175" min="0" step="any" value="175">
+    </div>
+    <div class="row">
+      <label for="people">割り勘人数（任意）</label>
+      <input type="number" id="people" inputmode="numeric" placeholder="例：4" min="1" step="1">
+      <div class="hint">入力すると1人あたりの負担額も表示します。</div>
+    </div>
+    <button class="primary" id="calc">ガソリン代を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">ガソリン代（概算）</p>
+      <div class="big" id="cost">—</div>
+      <table class="breakdown">
+        <tr><th>必要なガソリン量</th><td class="num" id="r-liter"></td></tr>
+        <tr><th>ガソリン代</th><td class="num" id="r-cost"></td></tr>
+        <tr id="row-per" hidden><th>1人あたり</th><td class="num" id="r-per"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>計算方法</h2>
+  <table class="breakdown">
+    <tr><th>必要なガソリン量</th><td>走行距離 ÷ 燃費</td></tr>
+    <tr><th>ガソリン代</th><td>必要なガソリン量 × ガソリン単価</td></tr>
+  </table>
+
+  <h2>燃費の目安</h2>
+  <p>燃費は車種や運転状況で大きく変わります。軽自動車・コンパクトカーで15〜25km/L、普通車で10〜18km/L、ハイブリッド車で20〜35km/L程度が一般的な目安です。実燃費はカタログ値より1〜2割低くなる傾向があります。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>往復で計算したいときは？</dt>
+    <dd>走行距離に往復の合計距離を入力してください。片道300kmなら600kmと入れます。</dd>
+    <dt>高速代は含まれますか？</dt>
+    <dd>このツールはガソリン代のみの計算です。高速道路の通行料は別途加算してください。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は概算です。実燃費・ガソリン価格は地域や状況により変動します。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const distance = parseFloat(document.getElementById('distance').value);
+  const mileage = parseFloat(document.getElementById('mileage').value);
+  const price = parseFloat(document.getElementById('price').value);
+  if (!(distance > 0)) { alert('走行距離を入力してください'); return; }
+  if (!(mileage > 0)) { alert('燃費を入力してください'); return; }
+  if (!(price > 0)) { alert('ガソリン単価を入力してください'); return; }
+
+  const liter = distance / mileage;
+  const cost = liter * price;
+
+  document.getElementById('cost').textContent = yen(cost);
+  document.getElementById('r-liter').textContent = liter.toFixed(2) + ' L';
+  document.getElementById('r-cost').textContent = yen(cost);
+
+  const people = parseInt(document.getElementById('people').value, 10);
+  const rowPer = document.getElementById('row-per');
+  if (people && people > 0) {
+    document.getElementById('r-per').textContent = yen(cost / people) + '（' + people + '人）';
+    rowPer.hidden = false;
+  } else {
+    rowPer.hidden = true;
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

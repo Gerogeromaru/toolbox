@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>パーセント計算ツール（割合・○%・増減率をまとめて計算）| Toolbox</title>
+<meta name="description" content="「AはBの何%？」「Bの○%はいくつ？」「AからBへの増減率は？」をまとめて計算できる無料ツール。割合や増減率の計算に。会員登録不要です。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/percent/">
+<meta property="og:title" content="パーセント計算ツール（割合・○%・増減率をまとめて計算）">
+<meta property="og:description" content="割合・○%・増減率をまとめて計算できる無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/percent/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>パーセント計算ツール</h1>
+  <p class="lead">割合・「○%はいくつ」・増減率の3つの計算に対応。よく使うパーセント計算をまとめて行えます。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="mode">計算の種類</label>
+      <select id="mode">
+        <option value="ratio" selected>AはBの何%？</option>
+        <option value="of">Bの A% はいくつ？</option>
+        <option value="change">AからBへの増減率は？</option>
+      </select>
+    </div>
+    <div class="row">
+      <label id="label-a" for="a">A</label>
+      <input type="number" id="a" inputmode="decimal" step="any">
+    </div>
+    <div class="row">
+      <label id="label-b" for="b">B</label>
+      <input type="number" id="b" inputmode="decimal" step="any">
+    </div>
+    <button class="primary" id="calc">計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">結果</p>
+      <div class="big" id="out">—</div>
+      <p class="sub" id="sub"></p>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>3つの計算の使い分け</h2>
+  <table class="breakdown">
+    <tr><th>AはBの何%？</th><td>例：30は150の何%？ → 20%（A÷B×100）</td></tr>
+    <tr><th>Bの A%はいくつ？</th><td>例：1500の8%は？ → 120（B×A÷100）</td></tr>
+    <tr><th>増減率</th><td>例：200から250へ → +25%（(B−A)÷A×100）</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>増減率がマイナスになるのは？</dt>
+    <dd>BがAより小さいときは減少を表すマイナスになります。例：200から150へは −25%です。</dd>
+    <dt>パーセントと割（わり）の関係は？</dt>
+    <dd>1割＝10%、1分＝1%、1厘＝0.1% です。たとえば「3割2分」は32%にあたります。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は小数の表示桁数の都合で丸められる場合があります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function num(n){ return parseFloat(n.toPrecision(10)).toLocaleString('ja-JP', { maximumFractionDigits: 4 }); }
+
+const modeEl = document.getElementById('mode');
+const labelA = document.getElementById('label-a');
+const labelB = document.getElementById('label-b');
+
+function updateLabels(){
+  const m = modeEl.value;
+  if (m === 'ratio') { labelA.textContent = 'A（部分）'; labelB.textContent = 'B（全体）'; }
+  else if (m === 'of') { labelA.textContent = 'A（パーセント %）'; labelB.textContent = 'B（もとの数）'; }
+  else { labelA.textContent = 'A（変化前）'; labelB.textContent = 'B（変化後）'; }
+  document.getElementById('result').hidden = true;
+}
+modeEl.addEventListener('change', updateLabels);
+updateLabels();
+
+document.getElementById('calc').addEventListener('click', function(){
+  const a = parseFloat(document.getElementById('a').value);
+  const b = parseFloat(document.getElementById('b').value);
+  if (isNaN(a) || isNaN(b)) { alert('AとBを入力してください'); return; }
+
+  const out = document.getElementById('out');
+  const sub = document.getElementById('sub');
+  const m = modeEl.value;
+
+  if (m === 'ratio') {
+    if (b === 0) { alert('Bに0は指定できません'); return; }
+    const r = a / b * 100;
+    out.textContent = num(r) + '%';
+    sub.textContent = num(a) + ' は ' + num(b) + ' の ' + num(r) + '%';
+  } else if (m === 'of') {
+    const v = b * a / 100;
+    out.textContent = num(v);
+    sub.textContent = num(b) + ' の ' + num(a) + '% は ' + num(v);
+  } else {
+    if (a === 0) { alert('変化前(A)に0は指定できません'); return; }
+    const r = (b - a) / a * 100;
+    out.textContent = (r >= 0 ? '+' : '') + num(r) + '%';
+    sub.textContent = num(a) + ' → ' + num(b) + ' は ' + (r >= 0 ? '増加' : '減少') + ' ' + num(Math.abs(r)) + '%';
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

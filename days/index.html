@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日数計算ツール（2つの日付の差・○日後の日付）| Toolbox</title>
+<meta name="description" content="2つの日付の間の日数を計算したり、ある日付から○日後・○日前の日付を求めたりできる無料ツール。記念日や締め切りの計算に。会員登録不要です。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/days/">
+<meta property="og:title" content="日数計算ツール（2つの日付の差・○日後の日付）">
+<meta property="og:description" content="日付の差や○日後の日付を計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/days/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>日数計算ツール</h1>
+  <p class="lead">2つの日付の間の<strong>日数</strong>を求めたり、ある日付から<strong>○日後・○日前</strong>の日付を計算できます。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="mode">計算の種類</label>
+      <select id="mode">
+        <option value="diff" selected>2つの日付の差を計算</option>
+        <option value="add">○日後・○日前の日付を計算</option>
+      </select>
+    </div>
+
+    <div id="diff-input">
+      <div class="row">
+        <label for="start">開始日</label>
+        <input type="date" id="start">
+      </div>
+      <div class="row">
+        <label for="end">終了日</label>
+        <input type="date" id="end">
+      </div>
+    </div>
+
+    <div id="add-input" hidden>
+      <div class="row">
+        <label for="base">基準の日付</label>
+        <input type="date" id="base">
+      </div>
+      <div class="row">
+        <label for="offset">日数（後ろは正、前は負）</label>
+        <input type="number" id="offset" inputmode="numeric" placeholder="例：100 / -30" step="1">
+        <div class="hint">「100」で100日後、「-30」で30日前を計算します。</div>
+      </div>
+    </div>
+
+    <button class="primary" id="calc">計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub" id="out-label">結果</p>
+      <div class="big" id="out">—</div>
+      <p class="sub" id="sub"></p>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>使い方の例</h2>
+  <ul>
+    <li>イベントや締め切りまであと何日かを確認する</li>
+    <li>記念日や付き合って○日目を計算する</li>
+    <li>契約日から100日後の日付を求める</li>
+  </ul>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>「日数の差」に当日は含まれますか？</dt>
+    <dd>本ツールは2つの日付の単純な差（終了日−開始日）を日数で表示します。たとえば1日と2日の差は1日です。両端を含めて数えたい場合は＋1してください。</dd>
+    <dt>曜日も分かりますか？</dt>
+    <dd>はい。結果には計算した日付の曜日も表示します。</dd>
+  </dl>
+
+  <p class="disclaimer">※ うるう年も含めて正確に計算しますが、タイムゾーンは端末の設定に依存します。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+const WD = ['日','月','火','水','木','金','土'];
+const msPerDay = 24 * 60 * 60 * 1000;
+
+function fmt(d){
+  return d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日（' + WD[d.getDay()] + '）';
+}
+
+const modeEl = document.getElementById('mode');
+modeEl.addEventListener('change', function(){
+  const add = this.value === 'add';
+  document.getElementById('diff-input').hidden = add;
+  document.getElementById('add-input').hidden = !add;
+  document.getElementById('result').hidden = true;
+});
+
+document.getElementById('calc').addEventListener('click', function(){
+  const out = document.getElementById('out');
+  const sub = document.getElementById('sub');
+  const label = document.getElementById('out-label');
+
+  if (modeEl.value === 'diff') {
+    const s = document.getElementById('start').value;
+    const e = document.getElementById('end').value;
+    if (!s || !e) { alert('開始日と終了日を入力してください'); return; }
+    const sd = new Date(s + 'T00:00:00');
+    const ed = new Date(e + 'T00:00:00');
+    const diff = Math.round((ed - sd) / msPerDay);
+    label.textContent = '日数の差';
+    out.textContent = Math.abs(diff).toLocaleString('ja-JP') + '日';
+    sub.textContent = fmt(sd) + ' 〜 ' + fmt(ed) +
+      (diff < 0 ? '（終了日が前です）' : '');
+  } else {
+    const b = document.getElementById('base').value;
+    const off = parseInt(document.getElementById('offset').value, 10);
+    if (!b) { alert('基準の日付を入力してください'); return; }
+    if (isNaN(off)) { alert('日数を入力してください'); return; }
+    const bd = new Date(b + 'T00:00:00');
+    const rd = new Date(bd.getTime() + off * msPerDay);
+    label.textContent = (off >= 0 ? off + '日後' : (-off) + '日前') + 'の日付';
+    out.textContent = fmt(rd);
+    sub.textContent = '基準日：' + fmt(bd);
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

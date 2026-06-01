@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>出産予定日計算ツール（最終月経日から予定日・妊娠週数）| Toolbox</title>
+<meta name="description" content="最終月経の開始日を入力するだけで、出産予定日・現在の妊娠週数・妊娠月を自動計算。ネーゲレ概算法による会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/due-date/">
+<meta property="og:title" content="出産予定日計算ツール（最終月経日から予定日・妊娠週数）">
+<meta property="og:description" content="最終月経日から出産予定日と妊娠週数を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/due-date/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>出産予定日計算ツール</h1>
+  <p class="lead">最終月経の開始日を入力すると、<strong>出産予定日</strong>と<strong>現在の妊娠週数</strong>の目安を自動で計算します（ネーゲレ概算法）。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="lmp">最終月経の開始日</label>
+      <input type="date" id="lmp">
+      <div class="hint">最後に生理が始まった日を入力してください。</div>
+    </div>
+    <div class="row">
+      <label for="today">基準日（未入力なら今日）</label>
+      <input type="date" id="today">
+    </div>
+    <button class="primary" id="calc">出産予定日を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">出産予定日（目安）</p>
+      <div class="big" id="due">—</div>
+      <table class="breakdown">
+        <tr><th>出産予定日</th><td class="num" id="r-due"></td></tr>
+        <tr><th>現在の妊娠週数</th><td class="num" id="r-week"></td></tr>
+        <tr><th>妊娠月（およそ）</th><td class="num" id="r-month"></td></tr>
+        <tr><th>予定日まで</th><td class="num" id="r-left"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>出産予定日の求め方</h2>
+  <p>出産予定日は、最終月経開始日を妊娠0週0日として<strong>280日後（40週0日）</strong>とするのが一般的です（ネーゲレ概算法）。月経周期が28日でない方や排卵日が分かっている方は、実際の予定日とずれることがあります。</p>
+
+  <h2>妊娠週数と月の対応</h2>
+  <table class="breakdown">
+    <tr><th>妊娠初期</th><td>0〜15週（1〜4か月）</td></tr>
+    <tr><th>妊娠中期</th><td>16〜27週（5〜7か月）</td></tr>
+    <tr><th>妊娠後期</th><td>28〜39週（8〜10か月）</td></tr>
+    <tr><th>正期産</th><td>37〜41週</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>生理周期が不規則でも使えますか？</dt>
+    <dd>本ツールは周期28日を前提とした概算です。周期が大きく異なる場合や排卵日が分かる場合は、実際の予定日と差が出ます。正確な予定日は超音波検査などで医師が判断します。</dd>
+    <dt>妊娠○週○日はどう数えますか？</dt>
+    <dd>最終月経開始日を0週0日とし、7日で1週進みます。たとえば最終月経から70日経過なら10週0日です。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は概算であり、医学的な診断ではありません。正確な妊娠週数・予定日は必ず医療機関でご確認ください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+const WD = ['日','月','火','水','木','金','土'];
+const msPerDay = 24 * 60 * 60 * 1000;
+function fmt(d){ return d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日（' + WD[d.getDay()] + '）'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const lmpVal = document.getElementById('lmp').value;
+  if (!lmpVal) { alert('最終月経の開始日を入力してください'); return; }
+  const todayVal = document.getElementById('today').value;
+
+  const lmp = new Date(lmpVal + 'T00:00:00');
+  const base = todayVal ? new Date(todayVal + 'T00:00:00') : new Date(new Date().toDateString());
+
+  const due = new Date(lmp.getTime() + 280 * msPerDay);
+  const elapsed = Math.floor((base - lmp) / msPerDay);
+
+  document.getElementById('due').textContent = fmt(due);
+  document.getElementById('r-due').textContent = fmt(due);
+
+  if (elapsed < 0) {
+    document.getElementById('r-week').textContent = 'まだ最終月経前です';
+    document.getElementById('r-month').textContent = '—';
+  } else {
+    const w = Math.floor(elapsed / 7);
+    const d = elapsed % 7;
+    document.getElementById('r-week').textContent = '妊娠' + w + '週' + d + '日';
+    document.getElementById('r-month').textContent = '妊娠' + (Math.floor(w / 4) + 1) + 'か月ごろ';
+  }
+
+  const left = Math.round((due - base) / msPerDay);
+  document.getElementById('r-left').textContent =
+    left > 0 ? 'あと' + left + '日' : (left === 0 ? '予定日です' : '予定日を' + (-left) + '日過ぎています');
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

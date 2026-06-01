@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>複利・積立シミュレーター（つみたて投資の将来額を計算）| Toolbox</title>
+<meta name="description" content="初期投資額・毎月の積立額・年利・期間を入力するだけで、複利運用した将来の評価額・元本・運用益を自動計算。つみたてNISAやiDeCoの目安に。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/compound/">
+<meta property="og:title" content="複利・積立シミュレーター（つみたて投資の将来額を計算）">
+<meta property="og:description" content="積立額・年利・期間から複利運用後の評価額を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/compound/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>複利・積立シミュレーター</h1>
+  <p class="lead">初期投資額・毎月の積立額・年利・期間を入力すると、複利運用後の<strong>評価額・元本・運用益</strong>の概算を自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="principal">初期投資額（円）</label>
+      <input type="number" id="principal" inputmode="numeric" placeholder="例：100000" min="0" step="10000" value="0">
+    </div>
+    <div class="row">
+      <label for="monthly">毎月の積立額（円）</label>
+      <input type="number" id="monthly" inputmode="numeric" placeholder="例：30000" min="0" step="1000">
+    </div>
+    <div class="row">
+      <label for="rate">想定年利（%）</label>
+      <input type="number" id="rate" inputmode="decimal" placeholder="例：5" min="0" step="0.1">
+    </div>
+    <div class="row">
+      <label for="years">積立期間（年）</label>
+      <input type="number" id="years" inputmode="numeric" placeholder="例：20" min="1" step="1">
+    </div>
+    <button class="primary" id="calc">将来の金額を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">将来の評価額（概算）</p>
+      <div class="big" id="future">—</div>
+      <table class="breakdown">
+        <tr><th>元本合計（投資した総額）</th><td class="num" id="r-principal"></td></tr>
+        <tr><th>運用益</th><td class="num" id="r-gain"></td></tr>
+        <tr><th><strong>将来の評価額</strong></th><td class="num" id="r-future"><strong></strong></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>複利の力とは？</h2>
+  <p>複利とは、運用で得た利益を再び投資に回し、利益が利益を生む仕組みです。期間が長いほど雪だるま式に増えるため、つみたてNISAやiDeCoのような長期積立と相性がよいとされています。本ツールは年利を毎月複利（月利＝年利÷12）に換算して計算しています。</p>
+
+  <h2>計算方法</h2>
+  <table class="breakdown">
+    <tr><th>評価額</th><td>初期投資 ×(1+月利)^回数 ＋ 毎月積立 ×{(1+月利)^回数 −1}÷月利</td></tr>
+    <tr><th>元本合計</th><td>初期投資 ＋ 毎月積立 × 回数</td></tr>
+    <tr><th>運用益</th><td>評価額 − 元本合計</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>税金は考慮されていますか？</dt>
+    <dd>運用益への課税（通常20.315%）は考慮していません。NISA等の非課税制度を使わない場合は、運用益から税金が差し引かれます。</dd>
+    <dt>利回りは保証されますか？</dt>
+    <dd>いいえ。想定年利はあくまで仮定です。実際の投資は元本割れのリスクがあり、将来の成果を保証するものではありません。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は概算であり、特定の金融商品の勧誘や投資成果を保証するものではありません。投資判断はご自身の責任で行ってください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const principal = parseFloat(document.getElementById('principal').value) || 0;
+  const monthly = parseFloat(document.getElementById('monthly').value) || 0;
+  const annualRate = parseFloat(document.getElementById('rate').value);
+  const years = parseFloat(document.getElementById('years').value);
+  if (isNaN(annualRate) || annualRate < 0) { alert('想定年利を入力してください'); return; }
+  if (!years || years <= 0) { alert('積立期間を入力してください'); return; }
+  if (principal <= 0 && monthly <= 0) { alert('初期投資額か毎月の積立額を入力してください'); return; }
+
+  const n = Math.round(years * 12);
+  const r = annualRate / 100 / 12;
+
+  let future;
+  if (r === 0) {
+    future = principal + monthly * n;
+  } else {
+    const pow = Math.pow(1 + r, n);
+    future = principal * pow + monthly * (pow - 1) / r;
+  }
+  const cost = principal + monthly * n;
+  const gain = future - cost;
+
+  document.getElementById('future').textContent = yen(future);
+  document.getElementById('r-principal').textContent = yen(cost);
+  document.getElementById('r-gain').textContent = yen(gain);
+  document.querySelector('#r-future strong').textContent = yen(future);
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

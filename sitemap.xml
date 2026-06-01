@@ -41,6 +41,46 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://gerogeromaru.github.io/toolbox/compound/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/percent/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/unit/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/speed/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/fuel/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/days/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/wareki/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/bmr/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/due-date/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://gerogeromaru.github.io/toolbox/text-count/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://gerogeromaru.github.io/toolbox/privacy/</loc>
     <changefreq>yearly</changefreq>
   </url>

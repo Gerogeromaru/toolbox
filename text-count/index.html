@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文字数カウントツール（リアルタイムで文字数・行数を集計）| Toolbox</title>
+<meta name="description" content="文章を貼り付けるだけで、文字数（空白あり/なし）・行数・原稿用紙の枚数をリアルタイムに表示。レポートやSNS投稿の文字数チェックに。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/text-count/">
+<meta property="og:title" content="文字数カウントツール（リアルタイムで文字数・行数を集計）">
+<meta property="og:description" content="文字数・行数・原稿用紙枚数をリアルタイムに数える無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/text-count/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>文字数カウントツール</h1>
+  <p class="lead">文章を入力・貼り付けすると、<strong>文字数・行数・原稿用紙の枚数</strong>をリアルタイムに表示します。レポートやSNSの文字数チェックにどうぞ。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="text">文章を入力</label>
+      <textarea id="text" placeholder="ここに文章を入力または貼り付けてください"></textarea>
+    </div>
+    <table class="breakdown">
+      <tr><th>文字数（空白・改行を含む）</th><td class="num" id="r-all">0</td></tr>
+      <tr><th>文字数（空白・改行を除く）</th><td class="num" id="r-nospace">0</td></tr>
+      <tr><th>行数</th><td class="num" id="r-lines">0</td></tr>
+      <tr><th>原稿用紙（400字）</th><td class="num" id="r-genko">0枚</td></tr>
+    </table>
+    <button class="primary" id="clear" style="margin-top:12px;">クリア</button>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>主な用途</h2>
+  <ul>
+    <li>レポートや作文の文字数チェック（○字以内・○字以上）</li>
+    <li>SNS・ブログの投稿前の文字数確認</li>
+    <li>原稿用紙の枚数を把握する</li>
+  </ul>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>入力した文章はどこかに送信されますか？</dt>
+    <dd>いいえ。すべてお使いのブラウザ内だけで処理しており、文章がサーバーに送信・保存されることはありません。</dd>
+    <dt>改行や空白は文字数に含まれますか？</dt>
+    <dd>「空白・改行を含む」はすべてを数え、「空白・改行を除く」は半角/全角スペース・タブ・改行を除いた実質的な文字数です。多くの提出規定では後者が使われます。</dd>
+    <dt>絵文字や特殊文字は正しく数えられますか？</dt>
+    <dd>一部の絵文字（複数の符号で構成される文字）は2文字以上として数えられる場合があります。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 文字数の数え方は提出先の規定により異なる場合があります。最終的な判断は提出先の基準に合わせてください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+const ta = document.getElementById('text');
+
+function update(){
+  const text = ta.value;
+  const all = text.length;
+  const noSpace = text.replace(/\s/g, '').length;
+  const lines = text === '' ? 0 : text.split('\n').length;
+  const genko = Math.ceil(noSpace / 400);
+
+  document.getElementById('r-all').textContent = all.toLocaleString('ja-JP');
+  document.getElementById('r-nospace').textContent = noSpace.toLocaleString('ja-JP');
+  document.getElementById('r-lines').textContent = lines.toLocaleString('ja-JP');
+  document.getElementById('r-genko').textContent = genko.toLocaleString('ja-JP') + '枚';
+}
+
+ta.addEventListener('input', update);
+document.getElementById('clear').addEventListener('click', function(){
+  ta.value = '';
+  update();
+  ta.focus();
+});
+update();
+</script>
+</body>
+</html>

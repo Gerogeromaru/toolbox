@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>基礎代謝・必要カロリー計算ツール（BMR・TDEE）| Toolbox</title>
+<meta name="description" content="性別・年齢・身長・体重・活動量を入力するだけで、基礎代謝量（BMR）と1日の必要カロリー（TDEE）を自動計算。ダイエットや健康管理の目安に。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/bmr/">
+<meta property="og:title" content="基礎代謝・必要カロリー計算ツール（BMR・TDEE）">
+<meta property="og:description" content="基礎代謝量と1日の必要カロリーを自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/bmr/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>基礎代謝・必要カロリー計算ツール</h1>
+  <p class="lead">性別・年齢・身長・体重・活動量を入力すると、<strong>基礎代謝量（BMR）</strong>と<strong>1日の必要カロリー（TDEE）</strong>を自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="sex">性別</label>
+      <select id="sex">
+        <option value="male" selected>男性</option>
+        <option value="female">女性</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="age">年齢</label>
+      <input type="number" id="age" inputmode="numeric" placeholder="例：30" min="1" step="1">
+    </div>
+    <div class="row">
+      <label for="height">身長（cm）</label>
+      <input type="number" id="height" inputmode="decimal" placeholder="例：170" min="0" step="0.1">
+    </div>
+    <div class="row">
+      <label for="weight">体重（kg）</label>
+      <input type="number" id="weight" inputmode="decimal" placeholder="例：65" min="0" step="0.1">
+    </div>
+    <div class="row">
+      <label for="activity">活動レベル</label>
+      <select id="activity">
+        <option value="1.2">ほとんど運動しない（デスクワーク中心）</option>
+        <option value="1.375" selected>軽い運動（週1〜2回）</option>
+        <option value="1.55">中程度の運動（週3〜5回）</option>
+        <option value="1.725">激しい運動（週6〜7回）</option>
+        <option value="1.9">非常に激しい（毎日激しい運動・肉体労働）</option>
+      </select>
+    </div>
+    <button class="primary" id="calc">カロリーを計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">1日の必要カロリー（維持カロリー）</p>
+      <div class="big" id="tdee">—</div>
+      <table class="breakdown">
+        <tr><th>基礎代謝量（BMR）</th><td class="num" id="r-bmr"></td></tr>
+        <tr><th>1日の必要カロリー（TDEE）</th><td class="num" id="r-tdee"></td></tr>
+        <tr><th>減量の目安（−約0.5kg/週）</th><td class="num" id="r-lose"></td></tr>
+        <tr><th>増量の目安（＋約0.5kg/週）</th><td class="num" id="r-gain"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>BMRとTDEEとは？</h2>
+  <p><strong>BMR（基礎代謝量）</strong>は、何もせず安静にしていても生命維持に消費されるエネルギーです。<strong>TDEE（総消費エネルギー量）</strong>は、BMRに日常の活動量をかけた、1日に実際に消費するカロリーの目安です。本ツールはミフリン・セントジョール式で計算しています。</p>
+
+  <h2>ダイエットの考え方</h2>
+  <p>体脂肪1kgは約7,200kcalに相当します。1週間で約0.5kg減らすには、1日あたり約500kcalの消費オーバー（摂取＜消費）が目安になります。極端な制限は健康を損なうおそれがあるため、無理のない範囲で行いましょう。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>計算式は何を使っていますか？</dt>
+    <dd>ミフリン・セントジョール式です。男性：10×体重＋6.25×身長−5×年齢＋5、女性：同式の末尾を−161として計算します。</dd>
+    <dt>結果はどれくらい正確ですか？</dt>
+    <dd>あくまで推定値です。筋肉量や体質、体組成によって実際の代謝量は前後します。目安としてご利用ください。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は目安であり、医学的・栄養学的な助言ではありません。減量・増量は体調に合わせ、必要に応じて専門家にご相談ください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function kcal(n){ return Math.round(n).toLocaleString('ja-JP') + ' kcal'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const sex = document.getElementById('sex').value;
+  const age = parseFloat(document.getElementById('age').value);
+  const cm = parseFloat(document.getElementById('height').value);
+  const kg = parseFloat(document.getElementById('weight').value);
+  const act = parseFloat(document.getElementById('activity').value);
+  if (!(age > 0)) { alert('年齢を入力してください'); return; }
+  if (!(cm > 0)) { alert('身長を入力してください'); return; }
+  if (!(kg > 0)) { alert('体重を入力してください'); return; }
+
+  let bmr = 10 * kg + 6.25 * cm - 5 * age;
+  bmr += (sex === 'male') ? 5 : -161;
+  const tdee = bmr * act;
+
+  document.getElementById('tdee').textContent = kcal(tdee);
+  document.getElementById('r-bmr').textContent = kcal(bmr);
+  document.getElementById('r-tdee').textContent = kcal(tdee);
+  document.getElementById('r-lose').textContent = kcal(tdee - 500);
+  document.getElementById('r-gain').textContent = kcal(tdee + 500);
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

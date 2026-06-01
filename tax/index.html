@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>消費税計算ツール（税込・税抜をワンタッチ変換）| Toolbox</title>
+<meta name="description" content="金額を入力するだけで、税抜→税込、税込→税抜を自動計算。消費税10%・軽減税率8%に対応した会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/tax/">
+<meta property="og:title" content="消費税計算ツール（税込・税抜をワンタッチ変換）">
+<meta property="og:description" content="税抜・税込を自動変換。消費税10%・軽減税率8%対応の無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/tax/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>消費税計算ツール</h1>
+  <p class="lead">金額を入力すると、<strong>税抜・税込・消費税額</strong>を自動で計算します。消費税10%と軽減税率8%に対応しています。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="amount">金額（円）</label>
+      <input type="number" id="amount" inputmode="numeric" placeholder="例：1000" min="0" step="1">
+    </div>
+    <div class="row">
+      <label for="kind">入力した金額は？</label>
+      <select id="kind">
+        <option value="excluded" selected>税抜価格（この金額に税を足す）</option>
+        <option value="included">税込価格（この金額から税を抜く）</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="rate">税率</label>
+      <select id="rate">
+        <option value="0.10" selected>10%（標準税率）</option>
+        <option value="0.08">8%（軽減税率／食品・新聞など）</option>
+      </select>
+    </div>
+    <button class="primary" id="calc">計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">税込価格</p>
+      <div class="big" id="total">—</div>
+      <table class="breakdown">
+        <tr><th>税抜価格</th><td class="num" id="r-ex"></td></tr>
+        <tr><th>消費税額</th><td class="num" id="r-tax"></td></tr>
+        <tr><th><strong>税込価格</strong></th><td class="num" id="r-in"><strong></strong></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>消費税の計算方法</h2>
+  <p>消費税は税抜価格に税率をかけて計算します。<strong>税込価格 ＝ 税抜価格 ×（1＋税率）</strong>。逆に税込価格から税抜価格を求めるには、<strong>税抜価格 ＝ 税込価格 ÷（1＋税率）</strong> で計算します（1円未満は切り捨てが一般的）。</p>
+
+  <h2>軽減税率8%の対象</h2>
+  <table class="breakdown">
+    <tr><th>8%（軽減税率）</th><td>酒類・外食を除く飲食料品、定期購読の新聞（週2回以上発行）</td></tr>
+    <tr><th>10%（標準税率）</th><td>上記以外の商品・サービス全般、外食、酒類</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>端数（1円未満）はどう処理されますか？</dt>
+    <dd>本ツールでは消費税額の1円未満を切り捨てて計算しています。実際の端数処理（切り捨て・切り上げ・四捨五入）は店舗や事業者により異なります。</dd>
+    <dt>外食やテイクアウトの税率は？</dt>
+    <dd>店内で飲食する「外食」は10%、テイクアウト・出前は8%（軽減税率）が適用されます。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は目安です。実際の請求では端数処理の方法により数円の差が生じる場合があります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const amount = parseFloat(document.getElementById('amount').value);
+  if (!amount || amount < 0) { alert('金額を入力してください'); return; }
+  const rate = parseFloat(document.getElementById('rate').value);
+  const included = document.getElementById('kind').value === 'included';
+
+  let ex, tax, incl;
+  if (included) {
+    ex = Math.floor(amount / (1 + rate));
+    tax = amount - ex;
+    incl = amount;
+  } else {
+    ex = amount;
+    tax = Math.floor(amount * rate);
+    incl = ex + tax;
+  }
+
+  document.getElementById('total').textContent = yen(incl);
+  document.getElementById('r-ex').textContent = yen(ex);
+  document.getElementById('r-tax').textContent = yen(tax);
+  document.querySelector('#r-in strong').textContent = yen(incl);
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>割引計算ツール（○%OFFの価格と割引額を即計算）| Toolbox</title>
+<meta name="description" content="元の価格と割引率を入力するだけで、割引後の価格・割引額を自動計算。セールやクーポンの値引き計算に便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/discount/">
+<meta property="og:title" content="割引計算ツール（○%OFFの価格と割引額を即計算）">
+<meta property="og:description" content="割引後の価格と割引額を自動計算。セール・クーポンに便利な無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/discount/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>割引計算ツール</h1>
+  <p class="lead">元の価格と割引率を入力すると、<strong>割引後の価格・割引額</strong>を自動で計算します。セールやクーポンの値引き計算にどうぞ。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="price">元の価格（円）</label>
+      <input type="number" id="price" inputmode="numeric" placeholder="例：3000" min="0" step="1">
+    </div>
+    <div class="row">
+      <label for="percent">割引率（%）</label>
+      <input type="number" id="percent" inputmode="decimal" placeholder="例：20" min="0" max="100" step="1">
+      <div class="hint">「20%OFF」なら 20 と入力してください。</div>
+    </div>
+    <button class="primary" id="calc">割引後の価格を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">割引後の価格</p>
+      <div class="big" id="final">—</div>
+      <table class="breakdown">
+        <tr><th>元の価格</th><td class="num" id="r-price"></td></tr>
+        <tr><th>割引率</th><td class="num" id="r-percent"></td></tr>
+        <tr><th>割引額</th><td class="num" id="r-off"></td></tr>
+        <tr><th><strong>割引後の価格</strong></th><td class="num" id="r-final"><strong></strong></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>割引の計算方法</h2>
+  <p>割引額は <strong>元の価格 × 割引率(%) ÷ 100</strong> で求められます。割引後の価格は <strong>元の価格 − 割引額</strong>、または <strong>元の価格 ×（1 − 割引率÷100）</strong> でも計算できます。たとえば3,000円の20%OFFなら、割引額は600円、支払額は2,400円です。</p>
+
+  <h2>「〇%OFF」と「〇割引」の違い</h2>
+  <table class="breakdown">
+    <tr><th>20%OFF</th><td>2割引と同じ（元の価格の80%）</td></tr>
+    <tr><th>30%OFF</th><td>3割引と同じ（元の価格の70%）</td></tr>
+    <tr><th>半額</th><td>50%OFF・5割引と同じ（元の価格の50%）</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>「20%OFFのさらに10%OFF」は合計30%OFF？</dt>
+    <dd>いいえ。割引を重ねる場合は掛け算になります。3,000円の20%OFF（2,400円）からさらに10%OFFすると2,160円となり、合計では28%OFF相当です。</dd>
+    <dt>消費税は含まれますか？</dt>
+    <dd>このツールは入力した価格をそのまま割引計算します。税込価格を入れれば税込での割引後価格が、税抜価格を入れれば税抜での価格が出ます。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は目安です。実際の販売価格は端数処理やポイント還元などにより異なる場合があります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const price = parseFloat(document.getElementById('price').value);
+  const percent = parseFloat(document.getElementById('percent').value);
+  if (!price || price < 0) { alert('元の価格を入力してください'); return; }
+  if (percent === undefined || isNaN(percent) || percent < 0 || percent > 100) { alert('割引率を0〜100の間で入力してください'); return; }
+
+  const off = price * percent / 100;
+  const final = price - off;
+
+  document.getElementById('final').textContent = yen(final);
+  document.getElementById('r-price').textContent = yen(price);
+  document.getElementById('r-percent').textContent = percent + '%';
+  document.getElementById('r-off').textContent = '−' + yen(off);
+  document.querySelector('#r-final strong').textContent = yen(final);
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

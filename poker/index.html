@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ポーカーチップ配分計算ツール（ホームゲームの配り方）| Toolbox</title>
+<meta name="description" content="参加人数と額面ごとの配布枚数を入力するだけで、1人あたりのスタック額・必要チップ枚数・場の総額を自動計算。テキサスホールデムのホームゲーム準備に便利な無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/poker/">
+<meta property="og:title" content="ポーカーチップ配分計算ツール（ホームゲームの配り方）">
+<meta property="og:description" content="人数と額面別枚数から1人あたりのスタックと必要チップ数を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/poker/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>ポーカーチップ配分計算ツール</h1>
+  <p class="lead">参加人数と額面ごとの配布枚数を入力すると、<strong>1人あたりのスタック額・必要チップ枚数・場の総額</strong>を自動で計算します。テキサスホールデムのホームゲーム準備にどうぞ。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="players">参加人数</label>
+      <input type="number" id="players" inputmode="numeric" placeholder="例：6" min="1" step="1" value="6">
+    </div>
+
+    <label>チップの額面と「1人あたりの配布枚数」</label>
+    <table class="breakdown" id="chip-table">
+      <tr><th>額面</th><th class="num">1人あたり枚数</th></tr>
+      <tr>
+        <td><input type="number" class="chip-val" inputmode="numeric" value="25" min="0"></td>
+        <td class="num"><input type="number" class="chip-cnt" inputmode="numeric" value="8" min="0"></td>
+      </tr>
+      <tr>
+        <td><input type="number" class="chip-val" inputmode="numeric" value="100" min="0"></td>
+        <td class="num"><input type="number" class="chip-cnt" inputmode="numeric" value="10" min="0"></td>
+      </tr>
+      <tr>
+        <td><input type="number" class="chip-val" inputmode="numeric" value="500" min="0"></td>
+        <td class="num"><input type="number" class="chip-cnt" inputmode="numeric" value="4" min="0"></td>
+      </tr>
+      <tr>
+        <td><input type="number" class="chip-val" inputmode="numeric" value="1000" min="0"></td>
+        <td class="num"><input type="number" class="chip-cnt" inputmode="numeric" value="2" min="0"></td>
+      </tr>
+      <tr>
+        <td><input type="number" class="chip-val" inputmode="numeric" placeholder="0" min="0"></td>
+        <td class="num"><input type="number" class="chip-cnt" inputmode="numeric" placeholder="0" min="0"></td>
+      </tr>
+    </table>
+    <div class="hint">空欄の行は無視されます。お手持ちのチップセットに合わせて額面を変更できます。</div>
+
+    <button class="primary" id="calc" style="margin-top:16px;">配分を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">1人あたりのスタック</p>
+      <div class="big" id="stack">—</div>
+      <table class="breakdown" id="out-table">
+        <tr><th>額面</th><th class="num">1人</th><th class="num">全員分</th></tr>
+        <!-- rows injected -->
+        <tr><th><strong>合計</strong></th><td class="num"><strong id="o-stack"></strong></td><td class="num"><strong id="o-pot"></strong></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>チップ配分の目安</h2>
+  <p>ホームゲームでは、1人あたりのスタックが<strong>初期ブラインドの100倍前後</strong>になるよう配ると、ゆったり遊べます。小さい額面（最小ベット用）を多めに、大きい額面を少なめにすると枚数のバランスが取りやすくなります。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>必要なチップが足りるか確認できますか？</dt>
+    <dd>「全員分」の列が、お手持ちのチップセットの各額面の枚数を超えていなければ足りています。超える場合は枚数や額面を調整してください。</dd>
+    <dt>リバイ（追加バイイン）の分も含められますか？</dt>
+    <dd>このツールは初期配布のみを計算します。リバイ用に別途チップを取り分けておくのがおすすめです。</dd>
+    <dt>ブラインドはどう設定すればいい？</dt>
+    <dd>例として1人あたりが2,000点なら、初期ブラインドを10/20点程度から始めると100BB（ビッグブラインドの100倍）スタートになり、じっくり楽しめます。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールは家庭・友人間でのカジュアルなゲーム準備を想定した計算ツールです。金銭を賭ける行為は各国・各地域の法令に従ってください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function num(n){ return n.toLocaleString('ja-JP'); }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const players = parseInt(document.getElementById('players').value, 10);
+  if (!players || players <= 0) { alert('参加人数を入力してください'); return; }
+
+  const vals = document.querySelectorAll('.chip-val');
+  const cnts = document.querySelectorAll('.chip-cnt');
+  const rows = [];
+  let stack = 0;
+
+  for (let i = 0; i < vals.length; i++) {
+    const v = parseInt(vals[i].value, 10);
+    const c = parseInt(cnts[i].value, 10);
+    if (!v || v <= 0 || !c || c <= 0) continue;
+    rows.push({ val: v, cnt: c });
+    stack += v * c;
+  }
+
+  if (rows.length === 0) { alert('額面と枚数を入力してください'); return; }
+
+  const out = document.getElementById('out-table');
+  // remove previously injected rows (keep header[0] and total[last])
+  while (out.rows.length > 2) { out.deleteRow(1); }
+
+  rows.forEach(function(r, idx){
+    const tr = out.insertRow(1 + idx);
+    tr.innerHTML = '<th>' + num(r.val) + '点</th>' +
+      '<td class="num">' + num(r.cnt) + '枚</td>' +
+      '<td class="num">' + num(r.cnt * players) + '枚</td>';
+  });
+
+  const pot = stack * players;
+  document.getElementById('stack').textContent = num(stack) + '点';
+  document.getElementById('o-stack').textContent = num(stack) + '点';
+  document.getElementById('o-pot').textContent = num(pot) + '点';
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

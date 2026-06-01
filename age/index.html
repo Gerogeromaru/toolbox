@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>年齢計算ツール（生年月日から満年齢・生まれてからの日数）| Toolbox</title>
+<meta name="description" content="生年月日を入力するだけで、満年齢・干支・生まれてからの日数・次の誕生日までの日数を自動計算。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/age/">
+<meta property="og:title" content="年齢計算ツール（生年月日から満年齢・生まれてからの日数）">
+<meta property="og:description" content="生年月日から満年齢・干支・生まれてからの日数を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/age/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>年齢計算ツール</h1>
+  <p class="lead">生年月日を入力すると、<strong>満年齢・干支・生まれてからの日数</strong>・次の誕生日までの日数を自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="birth">生年月日</label>
+      <input type="date" id="birth">
+    </div>
+    <div class="row">
+      <label for="base">基準日（未入力なら今日）</label>
+      <input type="date" id="base">
+      <div class="hint">特定の日付での年齢を知りたいときに指定できます。</div>
+    </div>
+    <button class="primary" id="calc">年齢を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">満年齢</p>
+      <div class="big" id="age">—</div>
+      <table class="breakdown">
+        <tr><th>満年齢</th><td class="num" id="r-age"></td></tr>
+        <tr><th>干支</th><td class="num" id="r-eto"></td></tr>
+        <tr><th>生まれてからの日数</th><td class="num" id="r-days"></td></tr>
+        <tr><th>次の誕生日まで</th><td class="num" id="r-next"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>満年齢と数え年の違い</h2>
+  <p>「満年齢」は生まれた日を0歳とし、誕生日が来るごとに1歳増える、現在一般的に使われている年齢の数え方です。一方「数え年」は生まれた時点で1歳とし、元日（1月1日）ごとに1歳増える昔ながらの数え方で、七五三や厄年などで使われることがあります。本ツールは満年齢で計算します。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>法律上、年齢はいつ増えますか？</dt>
+    <dd>日本の法律（年齢計算ニ関スル法律）では、誕生日の<strong>前日が終了する瞬間</strong>に1歳加算されます。そのため4月1日生まれの人は「早生まれ」として前学年に入ります。本ツールは一般的な「誕生日当日に加齢」で表示しています。</dd>
+    <dt>干支はどう決まりますか？</dt>
+    <dd>生まれた年（西暦）を12で割った余りで、子・丑・寅…の十二支が決まります。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は目安です。法律・制度上の正確な年齢判定が必要な場合は所管の機関にご確認ください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+var ETO = ['申','酉','戌','亥','子','丑','寅','卯','辰','巳','午','未'];
+
+document.getElementById('calc').addEventListener('click', function(){
+  const birthVal = document.getElementById('birth').value;
+  if (!birthVal) { alert('生年月日を入力してください'); return; }
+  const baseVal = document.getElementById('base').value;
+
+  const b = new Date(birthVal + 'T00:00:00');
+  const base = baseVal ? new Date(baseVal + 'T00:00:00') : new Date(new Date().toDateString());
+  if (base < b) { alert('基準日は生年月日より後の日付にしてください'); return; }
+
+  // 満年齢
+  let age = base.getFullYear() - b.getFullYear();
+  const beforeBirthday = (base.getMonth() < b.getMonth()) ||
+    (base.getMonth() === b.getMonth() && base.getDate() < b.getDate());
+  if (beforeBirthday) age--;
+
+  // 生まれてからの日数
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const days = Math.floor((base - b) / msPerDay);
+
+  // 次の誕生日まで
+  let next = new Date(base.getFullYear(), b.getMonth(), b.getDate());
+  if (next <= base) next = new Date(base.getFullYear() + 1, b.getMonth(), b.getDate());
+  const toNext = Math.round((next - base) / msPerDay);
+
+  // 干支
+  const eto = ETO[b.getFullYear() % 12];
+
+  document.getElementById('age').textContent = age + '歳';
+  document.getElementById('r-age').textContent = age + '歳';
+  document.getElementById('r-eto').textContent = eto + '年';
+  document.getElementById('r-days').textContent = days.toLocaleString('ja-JP') + '日';
+  document.getElementById('r-next').textContent = (toNext === 0 ? '今日が誕生日！' : 'あと' + toNext + '日');
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

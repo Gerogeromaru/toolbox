@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMI計算ツール（身長・体重から肥満度を判定）| Toolbox</title>
+<meta name="description" content="身長と体重を入力するだけで、BMI（体格指数）と肥満度の判定、適正体重を自動計算。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/bmi/">
+<meta property="og:title" content="BMI計算ツール（身長・体重から肥満度を判定）">
+<meta property="og:description" content="身長と体重からBMIと肥満度、適正体重を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/bmi/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>BMI計算ツール</h1>
+  <p class="lead">身長と体重を入力すると、<strong>BMI（体格指数）</strong>と肥満度の判定、適正体重を自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="height">身長（cm）</label>
+      <input type="number" id="height" inputmode="decimal" placeholder="例：170" min="0" step="0.1">
+    </div>
+    <div class="row">
+      <label for="weight">体重（kg）</label>
+      <input type="number" id="weight" inputmode="decimal" placeholder="例：65" min="0" step="0.1">
+    </div>
+    <button class="primary" id="calc">BMIを計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">あなたのBMI</p>
+      <div class="big" id="bmi">—</div>
+      <p class="sub">判定：<span id="judge">—</span></p>
+      <table class="breakdown">
+        <tr><th>BMI</th><td class="num" id="r-bmi"></td></tr>
+        <tr><th>判定</th><td class="num" id="r-judge"></td></tr>
+        <tr><th>適正体重（BMI22）</th><td class="num" id="r-ideal"></td></tr>
+        <tr><th>標準体重との差</th><td class="num" id="r-diff"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>BMIとは？</h2>
+  <p>BMI（Body Mass Index＝体格指数）は、体重と身長の関係から肥満度を表す国際的な指標です。<strong>体重(kg) ÷ (身長(m) × 身長(m))</strong> で計算します。日本肥満学会では、最も病気になりにくいとされるBMI22を「適正体重（標準体重）」としています。</p>
+
+  <h2>BMIの判定基準（日本肥満学会）</h2>
+  <table class="breakdown">
+    <tr><th>18.5未満</th><td>低体重（やせ）</td></tr>
+    <tr><th>18.5〜25未満</th><td>普通体重</td></tr>
+    <tr><th>25〜30未満</th><td>肥満（1度）</td></tr>
+    <tr><th>30〜35未満</th><td>肥満（2度）</td></tr>
+    <tr><th>35〜40未満</th><td>肥満（3度）</td></tr>
+    <tr><th>40以上</th><td>肥満（4度）</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>BMIだけで健康状態は分かりますか？</dt>
+    <dd>BMIは身長と体重だけで計算するため、筋肉量や体脂肪率、体型は反映されません。あくまで目安としてご利用ください。</dd>
+    <dt>適正体重とは何ですか？</dt>
+    <dd>BMIが22になるときの体重で、統計的に最も病気になりにくいとされる体重です。<strong>身長(m) × 身長(m) × 22</strong> で求められます。</dd>
+    <dt>子どもにも使えますか？</dt>
+    <dd>このツールは成人向けの判定基準です。成長期の子どもは別の指標（カウプ指数・ローレル指数など）が用いられます。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は目安であり、健康状態を診断・保証するものではありません。気になる症状がある場合は医療機関にご相談ください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function judgeBMI(bmi){
+  if (bmi < 18.5) return '低体重（やせ）';
+  if (bmi < 25)   return '普通体重';
+  if (bmi < 30)   return '肥満（1度）';
+  if (bmi < 35)   return '肥満（2度）';
+  if (bmi < 40)   return '肥満（3度）';
+  return '肥満（4度）';
+}
+
+document.getElementById('calc').addEventListener('click', function(){
+  const cm = parseFloat(document.getElementById('height').value);
+  const kg = parseFloat(document.getElementById('weight').value);
+  if (!cm || cm <= 0 || !kg || kg <= 0) { alert('身長と体重を入力してください'); return; }
+
+  const m = cm / 100;
+  const bmi = kg / (m * m);
+  const ideal = m * m * 22;
+  const diff = kg - ideal;
+  const judge = judgeBMI(bmi);
+
+  document.getElementById('bmi').textContent = bmi.toFixed(1);
+  document.getElementById('judge').textContent = judge;
+  document.getElementById('r-bmi').textContent = bmi.toFixed(1);
+  document.getElementById('r-judge').textContent = judge;
+  document.getElementById('r-ideal').textContent = ideal.toFixed(1) + 'kg';
+  document.getElementById('r-diff').textContent = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'kg';
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ローン返済シミュレーター（毎月の返済額を概算）| Toolbox</title>
+<meta name="description" content="借入額・金利・返済期間を入力するだけで、毎月の返済額・総返済額・利息総額を自動計算。住宅ローンやマイカーローンの目安に。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/loan/">
+<meta property="og:title" content="ローン返済シミュレーター（毎月の返済額を概算）">
+<meta property="og:description" content="借入額・金利・期間から毎月の返済額と総返済額を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/loan/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>ローン返済シミュレーター</h1>
+  <p class="lead">借入額・金利・返済期間を入力すると、<strong>毎月の返済額・総返済額・利息総額</strong>の概算を自動で計算します（元利均等返済）。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="principal">借入額（円）</label>
+      <input type="number" id="principal" inputmode="numeric" placeholder="例：3000000" min="0" step="100000">
+    </div>
+    <div class="row">
+      <label for="rate">年利（%）</label>
+      <input type="number" id="rate" inputmode="decimal" placeholder="例：1.5" min="0" step="0.01">
+    </div>
+    <div class="row">
+      <label for="years">返済期間（年）</label>
+      <input type="number" id="years" inputmode="numeric" placeholder="例：10" min="1" step="1">
+    </div>
+    <button class="primary" id="calc">返済額を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">毎月の返済額（概算）</p>
+      <div class="big" id="monthly">—</div>
+      <table class="breakdown">
+        <tr><th>借入額</th><td class="num" id="r-principal"></td></tr>
+        <tr><th>毎月の返済額</th><td class="num" id="r-monthly"></td></tr>
+        <tr><th>総返済額</th><td class="num" id="r-total"></td></tr>
+        <tr><th>うち利息総額</th><td class="num" id="r-interest"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>元利均等返済とは？</h2>
+  <p>このツールは「元利均等返済」方式で計算しています。毎月の返済額（元金＋利息）が一定になる方式で、住宅ローンやマイカーローンで最も一般的です。返済当初は利息の割合が大きく、後半になるほど元金の割合が増えていきます。</p>
+
+  <h2>毎月返済額の計算式</h2>
+  <p>毎月返済額は次の式で求めます（月利＝年利÷12、回数＝年数×12）。</p>
+  <table class="breakdown">
+    <tr><th>毎月返済額</th><td>借入額 × 月利 × (1+月利)^回数 ÷ {(1+月利)^回数 − 1}</td></tr>
+    <tr><th>総返済額</th><td>毎月返済額 × 返済回数</td></tr>
+    <tr><th>利息総額</th><td>総返済額 − 借入額</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>ボーナス返済には対応していますか？</dt>
+    <dd>このツールは毎月均等返済のみの概算です。ボーナス併用返済や繰り上げ返済は考慮していません。</dd>
+    <dt>金利が0%でも計算できますか？</dt>
+    <dd>はい。金利0%の場合は借入額を返済回数で割った金額が毎月の返済額になります。</dd>
+    <dt>実際の返済額と一致しますか？</dt>
+    <dd>金融機関では端数処理や手数料・保証料が加わるため、実際の返済額とは数百円程度の差が出ることがあります。あくまで目安としてご利用ください。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は概算であり、実際の借入条件・手数料・保証料等は金融機関により異なります。重要な判断は各金融機関にご確認ください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const principal = parseFloat(document.getElementById('principal').value);
+  const annualRate = parseFloat(document.getElementById('rate').value);
+  const years = parseFloat(document.getElementById('years').value);
+  if (!principal || principal <= 0) { alert('借入額を入力してください'); return; }
+  if (isNaN(annualRate) || annualRate < 0) { alert('年利を入力してください'); return; }
+  if (!years || years <= 0) { alert('返済期間を入力してください'); return; }
+
+  const n = Math.round(years * 12);
+  const r = annualRate / 100 / 12;
+
+  let monthly;
+  if (r === 0) {
+    monthly = principal / n;
+  } else {
+    const pow = Math.pow(1 + r, n);
+    monthly = principal * r * pow / (pow - 1);
+  }
+  const total = monthly * n;
+  const interest = total - principal;
+
+  document.getElementById('monthly').textContent = yen(monthly);
+  document.getElementById('r-principal').textContent = yen(principal);
+  document.getElementById('r-monthly').textContent = yen(monthly);
+  document.getElementById('r-total').textContent = yen(total);
+  document.getElementById('r-interest').textContent = yen(interest);
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

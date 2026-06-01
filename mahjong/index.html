@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>麻雀点数計算ツール（符・翻から点数を自動計算）| Toolbox</title>
+<meta name="description" content="親・子、ロン・ツモと符・翻を選ぶだけで、麻雀の点数と支払い内訳を自動計算。満貫・跳満・倍満・役満にも対応した会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/mahjong/">
+<meta property="og:title" content="麻雀点数計算ツール（符・翻から点数を自動計算）">
+<meta property="og:description" content="符・翻から麻雀の点数と支払い内訳を自動計算する無料ツール。満貫〜役満対応。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/mahjong/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>麻雀点数計算ツール</h1>
+  <p class="lead">親・子と上がり方、<strong>符・翻</strong>を選ぶだけで、点数と支払いの内訳を自動で計算します。満貫・跳満・倍満・三倍満・役満にも対応。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="dealer">親 or 子</label>
+      <select id="dealer">
+        <option value="child" selected>子（非親）</option>
+        <option value="dealer">親</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="win">上がり方</label>
+      <select id="win">
+        <option value="ron" selected>ロン（出上がり）</option>
+        <option value="tsumo">ツモ（自摸）</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="han">翻（ハン）</label>
+      <select id="han">
+        <option value="1">1翻</option>
+        <option value="2">2翻</option>
+        <option value="3" selected>3翻</option>
+        <option value="4">4翻</option>
+        <option value="5">5翻（満貫）</option>
+        <option value="6">6翻（跳満）</option>
+        <option value="7">7翻（跳満）</option>
+        <option value="8">8翻（倍満）</option>
+        <option value="9">9翻（倍満）</option>
+        <option value="10">10翻（三倍満）</option>
+        <option value="11">11翻（三倍満）</option>
+        <option value="12">12翻（三倍満）</option>
+        <option value="13">13翻以上（役満）</option>
+      </select>
+    </div>
+    <div class="row" id="fu-row">
+      <label for="fu">符（フ）</label>
+      <select id="fu">
+        <option value="20">20符</option>
+        <option value="25">25符（七対子）</option>
+        <option value="30" selected>30符</option>
+        <option value="40">40符</option>
+        <option value="50">50符</option>
+        <option value="60">60符</option>
+        <option value="70">70符</option>
+        <option value="80">80符</option>
+        <option value="90">90符</option>
+        <option value="100">100符</option>
+        <option value="110">110符</option>
+      </select>
+      <div class="hint">5翻以上は符に関係なく点数が決まります。</div>
+    </div>
+    <button class="primary" id="calc">点数を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub" id="rank-label">得点</p>
+      <div class="big" id="score">—</div>
+      <table class="breakdown">
+        <tr><th>条件</th><td class="num" id="r-cond"></td></tr>
+        <tr><th>合計得点</th><td class="num" id="r-score"></td></tr>
+        <tr><th>支払い内訳</th><td class="num" id="r-pay"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>点数の計算方法</h2>
+  <p>麻雀の点数は <strong>基本点 ＝ 符 × 2 の（2＋翻）乗</strong> で求めます。これを上がり方に応じて倍率をかけ、各支払いを<strong>100点単位に切り上げ</strong>て確定します。基本点が2000点を超える（4翻40符・3翻70符など）と満貫として扱われます。</p>
+
+  <h2>翻数による限定役（リミット）</h2>
+  <table class="breakdown">
+    <tr><th>5翻</th><td>満貫（子8,000 / 親12,000）</td></tr>
+    <tr><th>6〜7翻</th><td>跳満（子12,000 / 親18,000）</td></tr>
+    <tr><th>8〜9翻</th><td>倍満（子16,000 / 親24,000）</td></tr>
+    <tr><th>10〜12翻</th><td>三倍満（子24,000 / 親36,000）</td></tr>
+    <tr><th>13翻以上</th><td>役満（子32,000 / 親48,000）</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>本場（積み棒）やリーチ棒は含まれますか？</dt>
+    <dd>このツールは純粋な手の点数のみを計算します。1本場ごとの加算（ロン300点／ツモ各100点）やリーチ棒は別途加算してください。</dd>
+    <dt>「切り上げ満貫」には対応していますか？</dt>
+    <dd>基本点が2000点以上になる場合は満貫として計算します（4翻40符・3翻70符など）。ローカルルールの切り上げ満貫（4翻30符・3翻60符を満貫扱い）には対応していません。</dd>
+    <dt>20符・25符はどんなとき？</dt>
+    <dd>20符は平和ツモ、25符は七対子のときに使います。それ以外は通常30符以上になります。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールは一般的な点数計算ルールに基づく概算です。採用しているローカルルールによっては結果が異なる場合があります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function pts(n){ return n.toLocaleString('ja-JP') + '点'; }
+function ceil100(n){ return Math.ceil(n / 100) * 100; }
+
+function rankName(han, base){
+  if (han >= 13) return '役満';
+  if (han >= 11) return '三倍満';
+  if (han >= 8)  return '倍満';
+  if (han >= 6)  return '跳満';
+  if (han >= 5)  return '満貫';
+  if (base >= 2000) return '満貫';
+  return '';
+}
+
+function basePoints(fu, han){
+  if (han >= 13) return 8000;
+  if (han >= 11) return 6000;
+  if (han >= 8)  return 4000;
+  if (han >= 6)  return 3000;
+  if (han >= 5)  return 2000;
+  const base = fu * Math.pow(2, 2 + han);
+  return base >= 2000 ? 2000 : base;
+}
+
+const fuRow = document.getElementById('fu-row');
+document.getElementById('han').addEventListener('change', function(){
+  fuRow.style.display = parseInt(this.value, 10) >= 5 ? 'none' : '';
+});
+
+document.getElementById('calc').addEventListener('click', function(){
+  const isDealer = document.getElementById('dealer').value === 'dealer';
+  const isTsumo = document.getElementById('win').value === 'tsumo';
+  const han = parseInt(document.getElementById('han').value, 10);
+  const fu = parseInt(document.getElementById('fu').value, 10);
+
+  const base = basePoints(fu, han);
+  let total, pay;
+
+  if (isDealer) {
+    if (isTsumo) {
+      const each = ceil100(base * 2);
+      total = each * 3;
+      pay = '子全員から ' + pts(each) + ' ずつ（オール）';
+    } else {
+      total = ceil100(base * 6);
+      pay = '放銃者から ' + pts(total);
+    }
+  } else {
+    if (isTsumo) {
+      const fromDealer = ceil100(base * 2);
+      const fromChild = ceil100(base * 1);
+      total = fromDealer + fromChild * 2;
+      pay = '親 ' + pts(fromDealer) + ' ／ 子 ' + pts(fromChild) + ' ×2';
+    } else {
+      total = ceil100(base * 4);
+      pay = '放銃者から ' + pts(total);
+    }
+  }
+
+  const rank = rankName(han, base);
+  const condText = (isDealer ? '親' : '子') + '・' + (isTsumo ? 'ツモ' : 'ロン') +
+    '・' + han + '翻' + (han >= 5 ? '' : ' ' + fu + '符');
+
+  document.getElementById('rank-label').textContent = rank ? rank + '！' : '得点';
+  document.getElementById('score').textContent = pts(total);
+  document.getElementById('r-cond').textContent = condText;
+  document.getElementById('r-score').textContent = pts(total);
+  document.getElementById('r-pay').textContent = pay;
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>割り勘計算ツール（1人あたりの金額を端数処理つきで計算）| Toolbox</title>
+<meta name="description" content="合計金額と人数を入力するだけで、1人あたりの支払額を自動計算。10円・100円単位の切り上げや幹事の調整にも対応した会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/warikan/">
+<meta property="og:title" content="割り勘計算ツール（1人あたりの金額を端数処理つきで計算）">
+<meta property="og:description" content="合計金額と人数から1人あたりの支払額を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/warikan/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>割り勘計算ツール</h1>
+  <p class="lead">合計金額と人数を入力すると、<strong>1人あたりの支払額</strong>を自動で計算します。端数の切り上げや幹事の調整にも対応しています。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="total">合計金額（円）</label>
+      <input type="number" id="total" inputmode="numeric" placeholder="例：23800" min="0" step="1">
+    </div>
+    <div class="row">
+      <label for="people">人数</label>
+      <input type="number" id="people" inputmode="numeric" placeholder="例：5" min="1" step="1">
+    </div>
+    <div class="row">
+      <label for="round">端数処理</label>
+      <select id="round">
+        <option value="1" selected>1円単位（割り切る）</option>
+        <option value="10">10円単位に切り上げ</option>
+        <option value="100">100円単位に切り上げ</option>
+        <option value="500">500円単位に切り上げ</option>
+      </select>
+      <div class="hint">切り上げると集まった額が合計を上回り、余りが出ます。</div>
+    </div>
+    <button class="primary" id="calc">割り勘を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">1人あたりの支払額</p>
+      <div class="big" id="per">—</div>
+      <table class="breakdown">
+        <tr><th>合計金額</th><td class="num" id="r-total"></td></tr>
+        <tr><th>人数</th><td class="num" id="r-people"></td></tr>
+        <tr><th>1人あたり</th><td class="num" id="r-per"></td></tr>
+        <tr><th>集まる合計</th><td class="num" id="r-collected"></td></tr>
+        <tr><th id="diff-label">余り（おつり）</th><td class="num" id="r-diff"></td></tr>
+      </table>
+      <p class="sub" id="note"></p>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>幹事におすすめの使い方</h2>
+  <p>「100円単位に切り上げ」を選ぶと、1人あたりの金額がキリの良い数字になり、おつりのやり取りがラクになります。集まった金額が合計を上回った分（余り）は、幹事の負担分に充てたり次回に回したりできます。</p>
+
+  <h2>計算方法</h2>
+  <table class="breakdown">
+    <tr><th>1人あたり</th><td>合計金額 ÷ 人数（指定単位で切り上げ）</td></tr>
+    <tr><th>集まる合計</th><td>1人あたり × 人数</td></tr>
+    <tr><th>余り</th><td>集まる合計 − 合計金額</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>幹事だけ多め・少なめに払いたいときは？</dt>
+    <dd>まず全員均等で計算し、余りの範囲で幹事の支払いを調整するのが簡単です。たとえば余りが400円出れば、幹事はその分を負担して実質支払いを軽くできます。</dd>
+    <dt>男女や役職で金額を変えたいのですが？</dt>
+    <dd>このツールは均等割りのみに対応しています。傾斜配分が必要な場合は、人数を「課金単位の数」に置き換えて計算する方法があります。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は目安です。実際の集金は現場の状況に合わせて調整してください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const total = parseFloat(document.getElementById('total').value);
+  const people = parseInt(document.getElementById('people').value, 10);
+  const unit = parseInt(document.getElementById('round').value, 10);
+  if (!total || total <= 0) { alert('合計金額を入力してください'); return; }
+  if (!people || people <= 0) { alert('人数を入力してください'); return; }
+
+  const raw = total / people;
+  const per = Math.ceil(raw / unit) * unit;
+  const collected = per * people;
+  const diff = collected - total;
+
+  document.getElementById('per').textContent = yen(per);
+  document.getElementById('r-total').textContent = yen(total);
+  document.getElementById('r-people').textContent = people + '人';
+  document.getElementById('r-per').textContent = yen(per);
+  document.getElementById('r-collected').textContent = yen(collected);
+  document.getElementById('r-diff').textContent = yen(diff);
+
+  const note = document.getElementById('note');
+  if (diff > 0) {
+    document.getElementById('diff-label').textContent = '余り（多く集まる分）';
+    note.textContent = '※ ' + yen(diff) + ' 多く集まります。幹事の負担分やおつりに充てられます。';
+  } else {
+    document.getElementById('diff-label').textContent = '過不足';
+    note.textContent = 'ぴったり割り切れました。';
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

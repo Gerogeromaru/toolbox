@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1日の水分摂取量 計算ツール（体重から目安を算出）| Toolbox</title>
+<meta name="description" content="体重を入力するだけで、1日に必要な水分量の目安を自動計算。コップ何杯分かも表示。健康・熱中症対策の目安に便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/water-intake/">
+<meta property="og:title" content="1日の水分摂取量 計算ツール（体重から目安を算出）">
+<meta property="og:description" content="体重から1日に必要な水分量の目安を計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/water-intake/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>1日の水分摂取量 計算ツール</h1>
+  <p class="lead">体重を入力すると、1日に必要な<strong>水分量の目安</strong>を計算します。コップ（200ml）何杯分かも表示します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="weight">体重（kg）</label>
+      <input type="number" id="weight" inputmode="decimal" placeholder="例：60" min="0" step="0.1">
+    </div>
+    <div class="row">
+      <label for="activity">活動量</label>
+      <select id="activity">
+        <option value="35" selected>ふつう（35ml/kg）</option>
+        <option value="30">少なめ・座り中心（30ml/kg）</option>
+        <option value="40">多め・運動する日（40ml/kg）</option>
+      </select>
+    </div>
+    <button class="primary" id="calc">水分量の目安を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">1日の水分量の目安</p>
+      <div class="big" id="ml">—</div>
+      <table class="breakdown">
+        <tr><th>1日の目安</th><td class="num" id="r-ml"></td></tr>
+        <tr><th>コップ換算（200ml）</th><td class="num" id="r-cup"></td></tr>
+        <tr><th>ペットボトル換算（500ml）</th><td class="num" id="r-bottle"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>水分補給のポイント</h2>
+  <p>ここで表示されるのは食事に含まれる水分も含めた<strong>1日の総水分量の目安</strong>です。一般に、飲み水としては1〜1.5L程度を、のどが渇く前にこまめに分けて摂るのがよいとされています。夏場や運動時は失われる水分が増えるため、意識的な補給が大切です。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>計算式は？</dt>
+    <dd>体重(kg) × 1kgあたりの目安量(ml) で計算しています。一般的な成人の目安は体重1kgあたり30〜40mlとされています。</dd>
+    <dt>お茶やコーヒーも水分に含まれますか？</dt>
+    <dd>飲み物全般は水分補給になりますが、カフェインやアルコールには利尿作用があるため、水やお茶を中心にするのがおすすめです。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの結果は一般的な目安です。必要な水分量は気温・運動量・体調・持病により異なります。水分制限がある方は医師の指示に従ってください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('calc').addEventListener('click', function(){
+  const w = parseFloat(document.getElementById('weight').value);
+  const perKg = parseFloat(document.getElementById('activity').value);
+  if (!(w > 0)) { alert('体重を入力してください'); return; }
+
+  const ml = w * perKg;
+  const liters = ml / 1000;
+
+  document.getElementById('ml').textContent = liters.toFixed(1) + ' L';
+  document.getElementById('r-ml').textContent = Math.round(ml).toLocaleString('ja-JP') + ' ml（約' + liters.toFixed(1) + 'L）';
+  document.getElementById('r-cup').textContent = '約 ' + (ml / 200).toFixed(1) + ' 杯';
+  document.getElementById('r-bottle').textContent = '約 ' + (ml / 500).toFixed(1) + ' 本';
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

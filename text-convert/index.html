@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>テキスト変換ツール（大文字小文字・全角半角・かな変換）| Toolbox</title>
+<meta name="description" content="文章を貼り付けて変換の種類を選ぶだけで、大文字⇔小文字、全角⇔半角、ひらがな⇔カタカナを一括変換。ブラウザ内処理で安全な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/text-convert/">
+<meta property="og:title" content="テキスト変換ツール（大文字小文字・全角半角・かな変換）">
+<meta property="og:description" content="大文字小文字・全角半角・かなを一括変換する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/text-convert/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>テキスト変換ツール</h1>
+  <p class="lead">文章を入力し、変換の種類を選ぶだけで、<strong>大文字⇔小文字・全角⇔半角・ひらがな⇔カタカナ</strong>を一括変換します。処理はすべてブラウザ内で行います。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="input">変換するテキスト</label>
+      <textarea id="input" placeholder="ここに文章を入力または貼り付けてください"></textarea>
+    </div>
+    <div class="row">
+      <label for="op">変換の種類</label>
+      <select id="op">
+        <option value="upper">大文字にする（ABC）</option>
+        <option value="lower">小文字にする（abc）</option>
+        <option value="full2half">全角 → 半角（英数記号）</option>
+        <option value="half2full">半角 → 全角（英数記号）</option>
+        <option value="hira2kata">ひらがな → カタカナ</option>
+        <option value="kata2hira">カタカナ → ひらがな</option>
+      </select>
+    </div>
+    <button class="primary" id="calc">変換する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">変換結果</p>
+      <div class="row">
+        <textarea id="output" readonly></textarea>
+      </div>
+      <button class="primary" id="copy">コピーする</button>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>主な用途</h2>
+  <ul>
+    <li>入力フォーム用に全角の英数字を半角にそろえる</li>
+    <li>ふりがなのひらがな・カタカナを変換する</li>
+    <li>英文を一括で大文字・小文字に統一する</li>
+  </ul>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>入力した文章は送信されますか？</dt>
+    <dd>いいえ。すべてブラウザ内で処理され、サーバーへの送信・保存は行いません。</dd>
+    <dt>半角カナには対応していますか？</dt>
+    <dd>かな変換はひらがな⇔全角カタカナに対応しています。全角・半角変換は英数字・記号・スペースが対象です。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 変換は一般的な文字に対応していますが、一部の特殊文字は変換されない場合があります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function full2half(s){
+  return s.replace(/[Ａ-Ｚａ-ｚ０-９！-～]/g, function(c){
+    return String.fromCharCode(c.charCodeAt(0) - 0xFEE0);
+  }).replace(/　/g, ' ');
+}
+function half2full(s){
+  return s.replace(/[A-Za-z0-9!-~]/g, function(c){
+    return String.fromCharCode(c.charCodeAt(0) + 0xFEE0);
+  }).replace(/ /g, '　');
+}
+function hira2kata(s){
+  return s.replace(/[ぁ-ゖ]/g, function(c){
+    return String.fromCharCode(c.charCodeAt(0) + 0x60);
+  });
+}
+function kata2hira(s){
+  return s.replace(/[ァ-ヶ]/g, function(c){
+    return String.fromCharCode(c.charCodeAt(0) - 0x60);
+  });
+}
+
+document.getElementById('calc').addEventListener('click', function(){
+  const text = document.getElementById('input').value;
+  if (text === '') { alert('テキストを入力してください'); return; }
+  const op = document.getElementById('op').value;
+  let out;
+  switch (op) {
+    case 'upper': out = text.toUpperCase(); break;
+    case 'lower': out = text.toLowerCase(); break;
+    case 'full2half': out = full2half(text); break;
+    case 'half2full': out = half2full(text); break;
+    case 'hira2kata': out = hira2kata(text); break;
+    case 'kata2hira': out = kata2hira(text); break;
+    default: out = text;
+  }
+  document.getElementById('output').value = out;
+  document.getElementById('result').hidden = false;
+});
+
+document.getElementById('copy').addEventListener('click', function(){
+  const out = document.getElementById('output').value;
+  if (!out) return;
+  navigator.clipboard.writeText(out).then(function(){
+    const btn = document.getElementById('copy');
+    const orig = btn.textContent;
+    btn.textContent = 'コピーしました！';
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  });
+});
+</script>
+</body>
+</html>

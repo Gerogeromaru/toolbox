@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サイコロ・コイン・乱数ツール（ランダム生成）| Toolbox</title>
+<meta name="description" content="サイコロを振る・コインを投げる・指定範囲の乱数を出す、3つのランダム生成に対応した無料ツール。ゲームや順番決めに便利な会員登録不要です。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/dice/">
+<meta property="og:title" content="サイコロ・コイン・乱数ツール（ランダム生成）">
+<meta property="og:description" content="サイコロ・コイン・乱数をランダム生成する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/dice/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>サイコロ・コイン・乱数ツール</h1>
+  <p class="lead">サイコロを振る・コインを投げる・指定した範囲の<strong>乱数</strong>を出す。ボードゲームや順番決めにどうぞ。すべてブラウザ内で処理します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="mode">モード</label>
+      <select id="mode">
+        <option value="dice" selected>サイコロ</option>
+        <option value="coin">コイン</option>
+        <option value="number">乱数（範囲指定）</option>
+      </select>
+    </div>
+
+    <div id="dice-opts">
+      <div class="row">
+        <label for="faces">面の数</label>
+        <input type="number" id="faces" inputmode="numeric" value="6" min="2" step="1">
+      </div>
+      <div class="row">
+        <label for="dcount">個数</label>
+        <input type="number" id="dcount" inputmode="numeric" value="1" min="1" max="20" step="1">
+      </div>
+    </div>
+
+    <div id="coin-opts" hidden>
+      <div class="row">
+        <label for="ccount">枚数</label>
+        <input type="number" id="ccount" inputmode="numeric" value="1" min="1" max="50" step="1">
+      </div>
+    </div>
+
+    <div id="number-opts" hidden>
+      <div class="row">
+        <label for="min">最小</label>
+        <input type="number" id="min" inputmode="numeric" value="1" step="1">
+      </div>
+      <div class="row">
+        <label for="max">最大</label>
+        <input type="number" id="max" inputmode="numeric" value="100" step="1">
+      </div>
+    </div>
+
+    <button class="primary" id="go">ランダム実行</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub" id="out-label">結果</p>
+      <div class="big" id="out" style="word-break:break-all;">—</div>
+      <p class="sub" id="sub"></p>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>結果は本当にランダム？</dt>
+    <dd>ブラウザの暗号学的乱数（Web Crypto API）を使い、偏りの少ない一様乱数で生成しています。</dd>
+    <dt>20面ダイスなどにも使える？</dt>
+    <dd>はい。面の数を変えれば、4面・8面・20面など好きなサイコロを振れます。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 公式な抽選・くじには、主催者の定める正規の方法をご利用ください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function randInt(max){
+  const arr = new Uint32Array(1);
+  const limit = Math.floor(0xFFFFFFFF / max) * max;
+  let v;
+  do { window.crypto.getRandomValues(arr); v = arr[0]; } while (v >= limit);
+  return v % max;
+}
+
+const modeEl = document.getElementById('mode');
+function updateMode(){
+  document.getElementById('dice-opts').hidden = modeEl.value !== 'dice';
+  document.getElementById('coin-opts').hidden = modeEl.value !== 'coin';
+  document.getElementById('number-opts').hidden = modeEl.value !== 'number';
+  document.getElementById('result').hidden = true;
+}
+modeEl.addEventListener('change', updateMode);
+updateMode();
+
+document.getElementById('go').addEventListener('click', function(){
+  const out = document.getElementById('out');
+  const sub = document.getElementById('sub');
+  const label = document.getElementById('out-label');
+
+  if (modeEl.value === 'dice') {
+    const faces = parseInt(document.getElementById('faces').value, 10);
+    const count = parseInt(document.getElementById('dcount').value, 10);
+    if (!(faces >= 2) || !(count >= 1)) { alert('面の数・個数を正しく入力してください'); return; }
+    const rolls = [];
+    let sum = 0;
+    for (let i = 0; i < count; i++) { const r = randInt(faces) + 1; rolls.push(r); sum += r; }
+    label.textContent = faces + '面ダイス ×' + count;
+    out.textContent = rolls.join('  ');
+    sub.textContent = count > 1 ? '合計：' + sum : '';
+  } else if (modeEl.value === 'coin') {
+    const count = parseInt(document.getElementById('ccount').value, 10);
+    if (!(count >= 1)) { alert('枚数を入力してください'); return; }
+    const res = [];
+    let heads = 0;
+    for (let i = 0; i < count; i++) { const h = randInt(2) === 0; res.push(h ? '表' : '裏'); if (h) heads++; }
+    label.textContent = 'コイン ×' + count;
+    out.textContent = res.join('  ');
+    sub.textContent = count > 1 ? '表：' + heads + ' / 裏：' + (count - heads) : '';
+  } else {
+    let min = parseInt(document.getElementById('min').value, 10);
+    let max = parseInt(document.getElementById('max').value, 10);
+    if (isNaN(min) || isNaN(max)) { alert('最小・最大を入力してください'); return; }
+    if (min > max) { const t = min; min = max; max = t; }
+    const r = min + randInt(max - min + 1);
+    label.textContent = min + '〜' + max + ' の乱数';
+    out.textContent = r.toLocaleString('ja-JP');
+    sub.textContent = '';
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

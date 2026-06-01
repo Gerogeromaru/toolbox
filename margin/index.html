@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>利益率計算ツール（原価・売価から粗利率・値入率）| Toolbox</title>
+<meta name="description" content="原価と売価を入力すると利益額・粗利率・値入率を計算。逆に原価と目標の粗利率から売価も算出。商売や副業の価格設定に便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/margin/">
+<meta property="og:title" content="利益率計算ツール（原価・売価から粗利率・値入率）">
+<meta property="og:description" content="原価・売価から利益率を計算し、目標利益率から売価も求める無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/margin/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>利益率計算ツール</h1>
+  <p class="lead">原価と売価から<strong>利益額・粗利率・値入率</strong>を計算します。逆に、原価と目標の粗利率から<strong>売価</strong>を求めることもできます。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="mode">計算の種類</label>
+      <select id="mode">
+        <option value="from-price" selected>原価＋売価 → 利益率</option>
+        <option value="from-margin">原価＋目標粗利率 → 売価</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="cost">原価（円）</label>
+      <input type="number" id="cost" inputmode="numeric" placeholder="例：600" min="0" step="1">
+    </div>
+    <div class="row" id="row-price">
+      <label for="price">売価（円）</label>
+      <input type="number" id="price" inputmode="numeric" placeholder="例：1000" min="0" step="1">
+    </div>
+    <div class="row" id="row-margin" hidden>
+      <label for="target">目標の粗利率（%）</label>
+      <input type="number" id="target" inputmode="decimal" placeholder="例：40" min="0" max="99.9" step="0.1">
+      <div class="hint">粗利率＝利益 ÷ 売価。売価に占める利益の割合です。</div>
+    </div>
+    <button class="primary" id="calc">計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub" id="out-label">結果</p>
+      <div class="big" id="out">—</div>
+      <table class="breakdown">
+        <tr><th>原価</th><td class="num" id="r-cost"></td></tr>
+        <tr><th>売価</th><td class="num" id="r-price"></td></tr>
+        <tr><th>利益額</th><td class="num" id="r-profit"></td></tr>
+        <tr><th>粗利率（利益÷売価）</th><td class="num" id="r-margin"></td></tr>
+        <tr><th>値入率（利益÷原価）</th><td class="num" id="r-markup"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>粗利率と値入率の違い</h2>
+  <table class="breakdown">
+    <tr><th>粗利率</th><td>利益 ÷ <strong>売価</strong>。一般に「利益率」と言えばこちら</td></tr>
+    <tr><th>値入率（マークアップ率）</th><td>利益 ÷ <strong>原価</strong>。仕入れに対する上乗せ率</td></tr>
+  </table>
+  <p>例：原価600円・売価1000円なら、利益400円。粗利率は40%、値入率は約67%です。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>消費税は含まれますか？</dt>
+    <dd>このツールは税抜どうしで計算する想定です。税込で入れると税込ベースの利益率になります。</dd>
+    <dt>粗利率100%は設定できる？</dt>
+    <dd>粗利率は売価に占める利益の割合のため、100%にすると原価0が必要になります。100%未満で入力してください。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールは原価と売価のみの単純計算です。送料・手数料・人件費などの諸経費は含みません。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+function pct(n){ return n.toFixed(1) + '%'; }
+
+const modeEl = document.getElementById('mode');
+modeEl.addEventListener('change', function(){
+  const fromMargin = this.value === 'from-margin';
+  document.getElementById('row-price').hidden = fromMargin;
+  document.getElementById('row-margin').hidden = !fromMargin;
+  document.getElementById('result').hidden = true;
+});
+
+document.getElementById('calc').addEventListener('click', function(){
+  const cost = parseFloat(document.getElementById('cost').value);
+  if (!(cost >= 0) || isNaN(cost)) { alert('原価を入力してください'); return; }
+
+  let price;
+  if (modeEl.value === 'from-price') {
+    price = parseFloat(document.getElementById('price').value);
+    if (!(price > 0)) { alert('売価を入力してください'); return; }
+  } else {
+    const target = parseFloat(document.getElementById('target').value);
+    if (isNaN(target) || target < 0 || target >= 100) { alert('目標粗利率を0〜99.9%で入力してください'); return; }
+    price = cost / (1 - target / 100);
+  }
+
+  const profit = price - cost;
+  const margin = price > 0 ? profit / price * 100 : 0;
+  const markup = cost > 0 ? profit / cost * 100 : 0;
+
+  document.getElementById('out-label').textContent = modeEl.value === 'from-margin' ? '必要な売価' : '粗利率';
+  document.getElementById('out').textContent = modeEl.value === 'from-margin' ? yen(price) : pct(margin);
+  document.getElementById('r-cost').textContent = yen(cost);
+  document.getElementById('r-price').textContent = yen(price);
+  document.getElementById('r-profit').textContent = yen(profit);
+  document.getElementById('r-margin').textContent = pct(margin);
+  document.getElementById('r-markup').textContent = pct(markup);
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

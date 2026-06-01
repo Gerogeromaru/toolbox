@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>貯金目標シミュレーター（毎月いくら貯めればいい？）| Toolbox</title>
+<meta name="description" content="目標金額・期間・今ある貯金を入力するだけで、毎月・毎週・毎日いくら貯めればよいかを自動計算。貯金計画づくりに便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/savings-goal/">
+<meta property="og:title" content="貯金目標シミュレーター（毎月いくら貯めればいい？）">
+<meta property="og:description" content="目標金額と期間から毎月の貯金額を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/savings-goal/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>貯金目標シミュレーター</h1>
+  <p class="lead">目標金額・期間・今ある貯金を入力すると、<strong>毎月・毎週・毎日いくら貯めればよいか</strong>を自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="goal">目標金額（円）</label>
+      <input type="number" id="goal" inputmode="numeric" placeholder="例：1000000" min="0" step="10000">
+    </div>
+    <div class="row">
+      <label for="current">今ある貯金（円・任意）</label>
+      <input type="number" id="current" inputmode="numeric" placeholder="例：200000" min="0" step="10000" value="0">
+    </div>
+    <div class="row">
+      <label for="months">期間（か月）</label>
+      <input type="number" id="months" inputmode="numeric" placeholder="例：24" min="1" step="1">
+    </div>
+    <button class="primary" id="calc">必要な貯金ペースを計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">毎月の貯金額</p>
+      <div class="big" id="monthly">—</div>
+      <table class="breakdown">
+        <tr><th>あと貯める金額</th><td class="num" id="r-remain"></td></tr>
+        <tr><th>毎月</th><td class="num" id="r-monthly"></td></tr>
+        <tr><th>毎週（およそ）</th><td class="num" id="r-weekly"></td></tr>
+        <tr><th>毎日（およそ）</th><td class="num" id="r-daily"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>使い方のヒント</h2>
+  <p>「車の頭金を2年で」「旅行費用を半年で」など、目標と期限を決めると毎月の貯金額が明確になります。運用（利息）で増やす前提のシミュレーションは<a href="../compound/">複利・積立シミュレーター</a>をご利用ください。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>利息は考慮されますか？</dt>
+    <dd>いいえ。本ツールは利息なしで「自分で積み立てる金額」を計算します。投資で増やす場合は別途複利ツールをご利用ください。</dd>
+    <dt>毎週・毎日の金額はどう計算していますか？</dt>
+    <dd>毎月の金額をもとに、1か月＝約4.345週・約30.44日として概算しています。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は目安です。実際の貯金は収支の状況に合わせて調整してください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const goal = parseFloat(document.getElementById('goal').value);
+  const current = parseFloat(document.getElementById('current').value) || 0;
+  const months = parseInt(document.getElementById('months').value, 10);
+  if (!(goal > 0)) { alert('目標金額を入力してください'); return; }
+  if (!(months >= 1)) { alert('期間（か月）を入力してください'); return; }
+
+  const remain = Math.max(0, goal - current);
+  const monthly = remain / months;
+
+  document.getElementById('monthly').textContent = yen(monthly);
+  document.getElementById('r-remain').textContent = yen(remain);
+  document.getElementById('r-monthly').textContent = yen(monthly);
+  document.getElementById('r-weekly').textContent = yen(monthly / 4.345);
+  document.getElementById('r-daily').textContent = yen(monthly / 30.44);
+
+  if (remain === 0) {
+    document.getElementById('monthly').textContent = '達成済み！';
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

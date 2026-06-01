@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>偏差値計算ツール（点数・平均・標準偏差から）| Toolbox</title>
+<meta name="description" content="自分の点数・平均点・標準偏差を入力するだけで偏差値を自動計算。テストの立ち位置の把握に便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/deviation/">
+<meta property="og:title" content="偏差値計算ツール（点数・平均・標準偏差から）">
+<meta property="og:description" content="点数・平均・標準偏差から偏差値を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/deviation/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>偏差値計算ツール</h1>
+  <p class="lead">自分の点数・平均点・標準偏差を入力すると、<strong>偏差値</strong>を自動で計算します。テストでの自分の立ち位置の目安に。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="score">自分の点数</label>
+      <input type="number" id="score" inputmode="decimal" placeholder="例：80" step="any">
+    </div>
+    <div class="row">
+      <label for="mean">平均点</label>
+      <input type="number" id="mean" inputmode="decimal" placeholder="例：65" step="any">
+    </div>
+    <div class="row">
+      <label for="sd">標準偏差</label>
+      <input type="number" id="sd" inputmode="decimal" placeholder="例：12" min="0" step="any">
+      <div class="hint">テスト結果に記載されていることが多い数値です。</div>
+    </div>
+    <button class="primary" id="calc">偏差値を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">あなたの偏差値</p>
+      <div class="big" id="dev">—</div>
+      <table class="breakdown">
+        <tr><th>偏差値</th><td class="num" id="r-dev"></td></tr>
+        <tr><th>平均との差</th><td class="num" id="r-diff"></td></tr>
+        <tr><th>上位の目安</th><td class="num" id="r-rank"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>偏差値とは？</h2>
+  <p>偏差値は、平均点を50として、自分の点数が平均からどれだけ離れているかを表す指標です。<strong>偏差値 ＝ 50 ＋ 10 ×(点数 − 平均) ÷ 標準偏差</strong> で求めます。平均ちょうどなら偏差値50、平均より高ければ50超、低ければ50未満になります。</p>
+
+  <h2>偏差値と上位割合の目安</h2>
+  <table class="breakdown">
+    <tr><th>偏差値60</th><td>上位 約16%</td></tr>
+    <tr><th>偏差値65</th><td>上位 約7%</td></tr>
+    <tr><th>偏差値70</th><td>上位 約2%</td></tr>
+    <tr><th>偏差値50</th><td>ちょうど真ん中（上位50%）</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>標準偏差が分からないときは？</dt>
+    <dd>偏差値の計算には標準偏差が必要です。テストの成績表に記載がない場合は計算できません。</dd>
+    <dt>上位割合は正確ですか？</dt>
+    <dd>点数が正規分布に従うと仮定した理論上の目安です。実際の分布によってはずれることがあります。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 上位割合は正規分布を仮定した概算です。実際の試験結果とは異なる場合があります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+// 正規分布の上側確率（誤差関数の近似）
+function upperTail(z){
+  const t = 1 / (1 + 0.2316419 * Math.abs(z));
+  const d = 0.3989423 * Math.exp(-z * z / 2);
+  let p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+  if (z > 0) p = 1 - p;
+  return 1 - p; // 上側
+}
+
+document.getElementById('calc').addEventListener('click', function(){
+  const score = parseFloat(document.getElementById('score').value);
+  const mean = parseFloat(document.getElementById('mean').value);
+  const sd = parseFloat(document.getElementById('sd').value);
+  if (isNaN(score) || isNaN(mean)) { alert('点数と平均点を入力してください'); return; }
+  if (!(sd > 0)) { alert('標準偏差（0より大きい値）を入力してください'); return; }
+
+  const dev = 50 + 10 * (score - mean) / sd;
+  const z = (score - mean) / sd;
+  const upper = upperTail(z) * 100;
+
+  document.getElementById('dev').textContent = dev.toFixed(1);
+  document.getElementById('r-dev').textContent = dev.toFixed(1);
+  document.getElementById('r-diff').textContent = (score - mean >= 0 ? '+' : '') + (score - mean).toFixed(1) + '点';
+  document.getElementById('r-rank').textContent = '上位 約' + upper.toFixed(1) + '%';
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

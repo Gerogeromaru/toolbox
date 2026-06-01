@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アスペクト比・リサイズ計算ツール（縦横比を保って計算）| Toolbox</title>
+<meta name="description" content="元の幅・高さと、変更したい幅または高さを入力するだけで、縦横比を保ったもう一方のサイズを自動計算。アスペクト比（16:9など）も表示する会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/aspect-ratio/">
+<meta property="og:title" content="アスペクト比・リサイズ計算ツール（縦横比を保って計算）">
+<meta property="og:description" content="縦横比を保ってリサイズ後のサイズとアスペクト比を計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/aspect-ratio/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>アスペクト比・リサイズ計算ツール</h1>
+  <p class="lead">元のサイズと、変更したい幅または高さを入力すると、<strong>縦横比を保ったもう一方のサイズ</strong>と<strong>アスペクト比</strong>を計算します。画像・動画のリサイズにどうぞ。</p>
+
+  <div class="card">
+    <div class="row" style="display:flex; gap:8px;">
+      <div style="flex:1;">
+        <label for="ow">元の幅</label>
+        <input type="number" id="ow" inputmode="decimal" placeholder="例：1920" min="0" step="any">
+      </div>
+      <div style="flex:1;">
+        <label for="oh">元の高さ</label>
+        <input type="number" id="oh" inputmode="decimal" placeholder="例：1080" min="0" step="any">
+      </div>
+    </div>
+    <div class="row" style="display:flex; gap:8px;">
+      <div style="flex:1;">
+        <label for="nw">新しい幅</label>
+        <input type="number" id="nw" inputmode="decimal" placeholder="どちらか一方" min="0" step="any">
+      </div>
+      <div style="flex:1;">
+        <label for="nh">新しい高さ</label>
+        <input type="number" id="nh" inputmode="decimal" placeholder="だけ入力" min="0" step="any">
+      </div>
+    </div>
+    <button class="primary" id="calc">計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">リサイズ後のサイズ</p>
+      <div class="big" id="out">—</div>
+      <table class="breakdown">
+        <tr><th>アスペクト比</th><td class="num" id="r-ratio"></td></tr>
+        <tr><th>新しい幅</th><td class="num" id="r-w"></td></tr>
+        <tr><th>新しい高さ</th><td class="num" id="r-h"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>よく使うアスペクト比</h2>
+  <table class="breakdown">
+    <tr><th>16:9</th><td>フルHD・4K動画、YouTube（1920×1080 など）</td></tr>
+    <tr><th>4:3</th><td>従来のテレビ・一部のカメラ</td></tr>
+    <tr><th>1:1</th><td>正方形（Instagramの定番）</td></tr>
+    <tr><th>9:16</th><td>縦型動画（ショート・リール・TikTok）</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>幅と高さ、両方入れたらどうなる？</dt>
+    <dd>新しい幅を優先して、縦横比を保った高さを計算します。片方だけ入力するのが基本です。</dd>
+    <dt>アスペクト比はどう求めている？</dt>
+    <dd>元の幅と高さの最大公約数で割って、できるだけ簡単な整数比で表示しています。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 計算結果のサイズは小数になる場合があります。ピクセル指定では四捨五入してご利用ください。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function gcd(a, b){ a = Math.round(a); b = Math.round(b); while (b) { const t = b; b = a % b; a = t; } return a; }
+function num(n){ return parseFloat(n.toPrecision(8)).toLocaleString('ja-JP', { maximumFractionDigits: 2 }); }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const ow = parseFloat(document.getElementById('ow').value);
+  const oh = parseFloat(document.getElementById('oh').value);
+  const nw = parseFloat(document.getElementById('nw').value);
+  const nh = parseFloat(document.getElementById('nh').value);
+  if (!(ow > 0) || !(oh > 0)) { alert('元の幅・高さを入力してください'); return; }
+  if (!(nw > 0) && !(nh > 0)) { alert('新しい幅か高さのどちらかを入力してください'); return; }
+
+  let w, h;
+  if (nw > 0) { w = nw; h = nw * oh / ow; }
+  else { h = nh; w = nh * ow / oh; }
+
+  const g = gcd(ow, oh) || 1;
+  const ratio = Math.round(ow / g) + ':' + Math.round(oh / g);
+
+  document.getElementById('out').textContent = num(w) + ' × ' + num(h);
+  document.getElementById('r-ratio').textContent = ratio;
+  document.getElementById('r-w').textContent = num(w);
+  document.getElementById('r-h').textContent = num(h);
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

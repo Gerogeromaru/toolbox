@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ローマ数字変換ツール（アラビア数字⇔ローマ数字）| Toolbox</title>
+<meta name="description" content="アラビア数字（1, 2, 3…）とローマ数字（I, II, III…）を相互に変換。時計や年号の表記確認に便利な会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/roman/">
+<meta property="og:title" content="ローマ数字変換ツール（アラビア数字⇔ローマ数字）">
+<meta property="og:description" content="アラビア数字とローマ数字を相互変換する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/roman/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>ローマ数字変換ツール</h1>
+  <p class="lead">アラビア数字（1, 2, 3…）と<strong>ローマ数字</strong>（I, II, III…）を相互に変換します。1〜3999に対応しています。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="mode">変換の向き</label>
+      <select id="mode">
+        <option value="a2r" selected>アラビア数字 → ローマ数字</option>
+        <option value="r2a">ローマ数字 → アラビア数字</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="value" id="value-label">数字（1〜3999）</label>
+      <input type="text" id="value" placeholder="例：2026">
+    </div>
+    <button class="primary" id="calc">変換する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">変換結果</p>
+      <div class="big" id="out" style="word-break:break-all;">—</div>
+      <p class="sub" id="sub"></p>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>ローマ数字の基本</h2>
+  <table class="breakdown">
+    <tr><th>I = 1</th><td>V = 5</td></tr>
+    <tr><th>X = 10</th><td>L = 50</td></tr>
+    <tr><th>C = 100</th><td>D = 500</td></tr>
+    <tr><th>M = 1000</th><td>例：IV=4, IX=9, XL=40</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>0や負の数、4000以上は？</dt>
+    <dd>ローマ数字には0の表記がなく、本ツールは1〜3999に対応しています。</dd>
+    <dt>小文字でも入力できますか？</dt>
+    <dd>はい。ローマ数字→アラビア数字の変換では、小文字（i, v, x…）でも判定します。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールは標準的な表記法（減算則：IV, IX など）に基づきます。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+const MAP = [
+  [1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],
+  [100,'C'],[90,'XC'],[50,'L'],[40,'XL'],
+  [10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']
+];
+
+function toRoman(n){
+  let r = '';
+  MAP.forEach(function(p){ while (n >= p[0]) { r += p[1]; n -= p[0]; } });
+  return r;
+}
+function toArabic(s){
+  const vals = { I:1, V:5, X:10, L:50, C:100, D:500, M:1000 };
+  let total = 0, prev = 0;
+  for (let i = s.length - 1; i >= 0; i--) {
+    const v = vals[s[i]];
+    if (v < prev) total -= v; else { total += v; prev = v; }
+  }
+  return total;
+}
+
+const modeEl = document.getElementById('mode');
+const valueLabel = document.getElementById('value-label');
+modeEl.addEventListener('change', function(){
+  valueLabel.textContent = this.value === 'a2r' ? '数字（1〜3999）' : 'ローマ数字（例：MMXXVI）';
+  document.getElementById('result').hidden = true;
+});
+
+document.getElementById('calc').addEventListener('click', function(){
+  const raw = document.getElementById('value').value.trim();
+  if (!raw) { alert('値を入力してください'); return; }
+  const out = document.getElementById('out');
+  const sub = document.getElementById('sub');
+
+  if (modeEl.value === 'a2r') {
+    const n = parseInt(raw, 10);
+    if (isNaN(n) || n < 1 || n > 3999) { alert('1〜3999の整数を入力してください'); return; }
+    const r = toRoman(n);
+    out.textContent = r;
+    sub.textContent = n.toLocaleString('ja-JP') + ' ＝ ' + r;
+  } else {
+    const s = raw.toUpperCase();
+    if (!/^[IVXLCDM]+$/.test(s)) { alert('ローマ数字（I V X L C D M）で入力してください'); return; }
+    const n = toArabic(s);
+    // 逆変換して正規表記か検証
+    if (toRoman(n) !== s) { alert('正しいローマ数字の表記ではありません'); return; }
+    out.textContent = n.toLocaleString('ja-JP');
+    sub.textContent = s + ' ＝ ' + n.toLocaleString('ja-JP');
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>体脂肪量・除脂肪体重 計算ツール（体重×体脂肪率）| Toolbox</title>
+<meta name="description" content="体重と体脂肪率を入力するだけで、体脂肪量（kg）と除脂肪体重（筋肉や骨などの重さ）を自動計算。ダイエットや筋トレの目安に。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/body-fat/">
+<meta property="og:title" content="体脂肪量・除脂肪体重 計算ツール（体重×体脂肪率）">
+<meta property="og:description" content="体重と体脂肪率から体脂肪量と除脂肪体重を計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/body-fat/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>体脂肪量・除脂肪体重 計算ツール</h1>
+  <p class="lead">体重と体脂肪率を入力すると、<strong>体脂肪量</strong>と<strong>除脂肪体重</strong>（脂肪以外の筋肉・骨・水分などの重さ）を自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="weight">体重（kg）</label>
+      <input type="number" id="weight" inputmode="decimal" placeholder="例：65" min="0" step="0.1">
+    </div>
+    <div class="row">
+      <label for="rate">体脂肪率（%）</label>
+      <input type="number" id="rate" inputmode="decimal" placeholder="例：20" min="0" max="100" step="0.1">
+      <div class="hint">体組成計などで測定した数値を入力してください。</div>
+    </div>
+    <button class="primary" id="calc">計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">体脂肪量</p>
+      <div class="big" id="fat">—</div>
+      <table class="breakdown">
+        <tr><th>体脂肪量</th><td class="num" id="r-fat"></td></tr>
+        <tr><th>除脂肪体重（LBM）</th><td class="num" id="r-lbm"></td></tr>
+        <tr><th>判定（目安）</th><td class="num" id="r-judge"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>除脂肪体重とは？</h2>
+  <p>除脂肪体重（LBM：Lean Body Mass）は、体重から体脂肪を除いた重さで、筋肉・骨・内臓・水分などの合計です。ダイエット中に「除脂肪体重を保ちつつ体脂肪を減らす」ことが、健康的な減量の目安とされています。</p>
+
+  <h2>体脂肪率の目安（成人）</h2>
+  <table class="breakdown">
+    <tr><th>男性</th><td>低い10〜14% / 標準15〜19% / やや高い20〜24% / 高い25%〜</td></tr>
+    <tr><th>女性</th><td>低い14〜19% / 標準20〜24% / やや高い25〜29% / 高い30%〜</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>体脂肪率はどうやって測る？</dt>
+    <dd>家庭用の体組成計（体脂肪計）で測定できます。測定は同じ時間帯・条件で行うと変化を比較しやすくなります。</dd>
+    <dt>計算式は？</dt>
+    <dd>体脂肪量 ＝ 体重 × 体脂肪率÷100、除脂肪体重 ＝ 体重 − 体脂肪量 です。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの結果は入力値に基づく計算であり、測定機器の精度や測定条件により実際の値は異なります。医学的な診断ではありません。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function kg(n){ return n.toFixed(1) + ' kg'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const w = parseFloat(document.getElementById('weight').value);
+  const r = parseFloat(document.getElementById('rate').value);
+  if (!(w > 0)) { alert('体重を入力してください'); return; }
+  if (isNaN(r) || r < 0 || r > 100) { alert('体脂肪率を0〜100の間で入力してください'); return; }
+
+  const fat = w * r / 100;
+  const lbm = w - fat;
+
+  let judge;
+  if (r < 10) judge = 'かなり低い';
+  else if (r < 20) judge = '標準〜やや低い';
+  else if (r < 25) judge = 'やや高い';
+  else if (r < 30) judge = '高い';
+  else judge = 'かなり高い';
+
+  document.getElementById('fat').textContent = kg(fat);
+  document.getElementById('r-fat').textContent = kg(fat);
+  document.getElementById('r-lbm').textContent = kg(lbm);
+  document.getElementById('r-judge').textContent = judge + '（' + r + '%）';
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

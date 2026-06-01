@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星座占い早見ツール（誕生日から12星座と誕生石）| Toolbox</title>
+<meta name="description" content="生まれた月日を選ぶだけで、12星座（牡羊座・牡牛座…）と誕生石を判定。自分や友達の星座をすぐ確認できる会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/star-sign/">
+<meta property="og:title" content="星座占い早見ツール（誕生日から12星座と誕生石）">
+<meta property="og:description" content="誕生日から12星座と誕生石を判定する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/star-sign/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>星座早見ツール</h1>
+  <p class="lead">生まれた月日を選ぶと、<strong>12星座</strong>と<strong>誕生石</strong>を判定します。</p>
+
+  <div class="card">
+    <div class="row" style="display:flex; gap:8px;">
+      <div style="flex:1;">
+        <label for="month">月</label>
+        <select id="month"></select>
+      </div>
+      <div style="flex:1;">
+        <label for="day">日</label>
+        <select id="day"></select>
+      </div>
+    </div>
+    <button class="primary" id="calc">星座を調べる</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">あなたの星座</p>
+      <div class="big" id="sign">—</div>
+      <table class="breakdown">
+        <tr><th>星座</th><td class="num" id="r-sign"></td></tr>
+        <tr><th>期間</th><td class="num" id="r-range"></td></tr>
+        <tr><th>誕生石（その月）</th><td class="num" id="r-stone"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="ad-slot">広告スペース（AdSense審査通過後に表示）</div>
+
+  <h2>12星座の一覧</h2>
+  <table class="breakdown">
+    <tr><th>牡羊座</th><td>3/21〜4/19</td></tr>
+    <tr><th>牡牛座</th><td>4/20〜5/20</td></tr>
+    <tr><th>双子座</th><td>5/21〜6/21</td></tr>
+    <tr><th>蟹座</th><td>6/22〜7/22</td></tr>
+    <tr><th>獅子座</th><td>7/23〜8/22</td></tr>
+    <tr><th>乙女座</th><td>8/23〜9/22</td></tr>
+    <tr><th>天秤座</th><td>9/23〜10/23</td></tr>
+    <tr><th>蠍座</th><td>10/24〜11/22</td></tr>
+    <tr><th>射手座</th><td>11/23〜12/21</td></tr>
+    <tr><th>山羊座</th><td>12/22〜1/19</td></tr>
+    <tr><th>水瓶座</th><td>1/20〜2/18</td></tr>
+    <tr><th>魚座</th><td>2/19〜3/20</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>星座の境目（切り替わる日）の扱いは？</dt>
+    <dd>星座の境界は年や時刻により1日ほど前後することがあります。本ツールは一般的な区分で判定しています。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 星座の区分は一般的な目安です。占星術の流派により境界が異なる場合があります。</p>
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+const SIGNS = [
+  { name: '山羊座', from: [1,1],   to: [1,19],  range: '12/22〜1/19' },
+  { name: '水瓶座', from: [1,20],  to: [2,18],  range: '1/20〜2/18' },
+  { name: '魚座',   from: [2,19],  to: [3,20],  range: '2/19〜3/20' },
+  { name: '牡羊座', from: [3,21],  to: [4,19],  range: '3/21〜4/19' },
+  { name: '牡牛座', from: [4,20],  to: [5,20],  range: '4/20〜5/20' },
+  { name: '双子座', from: [5,21],  to: [6,21],  range: '5/21〜6/21' },
+  { name: '蟹座',   from: [6,22],  to: [7,22],  range: '6/22〜7/22' },
+  { name: '獅子座', from: [7,23],  to: [8,22],  range: '7/23〜8/22' },
+  { name: '乙女座', from: [8,23],  to: [9,22],  range: '8/23〜9/22' },
+  { name: '天秤座', from: [9,23],  to: [10,23], range: '9/23〜10/23' },
+  { name: '蠍座',   from: [10,24], to: [11,22], range: '10/24〜11/22' },
+  { name: '射手座', from: [11,23], to: [12,21], range: '11/23〜12/21' },
+  { name: '山羊座2',from: [12,22], to: [12,31], range: '12/22〜1/19' }
+];
+const STONES = ['ガーネット','アメジスト','アクアマリン','ダイヤモンド','エメラルド','真珠','ルビー','ペリドット','サファイア','オパール','トパーズ','ターコイズ'];
+
+const monthEl = document.getElementById('month');
+const dayEl = document.getElementById('day');
+for (let i = 1; i <= 12; i++) monthEl.add(new Option(i + '月', i));
+function fillDays(){
+  const m = parseInt(monthEl.value, 10);
+  const dim = [31,29,31,30,31,30,31,31,30,31,30,31][m-1];
+  const cur = dayEl.value;
+  dayEl.innerHTML = '';
+  for (let d = 1; d <= dim; d++) dayEl.add(new Option(d + '日', d));
+  if (cur && cur <= dim) dayEl.value = cur;
+}
+monthEl.addEventListener('change', fillDays);
+fillDays();
+
+document.getElementById('calc').addEventListener('click', function(){
+  const m = parseInt(monthEl.value, 10);
+  const d = parseInt(dayEl.value, 10);
+  const md = m * 100 + d;
+
+  let found = SIGNS.find(function(s){
+    const f = s.from[0]*100 + s.from[1];
+    const t = s.to[0]*100 + s.to[1];
+    return md >= f && md <= t;
+  });
+  const name = found.name.replace('2','');
+
+  document.getElementById('sign').textContent = name;
+  document.getElementById('r-sign').textContent = name;
+  document.getElementById('r-range').textContent = found.range;
+  document.getElementById('r-stone').textContent = STONES[m-1];
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>

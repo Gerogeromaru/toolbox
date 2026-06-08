@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光回線 乗り換え 料金シミュレーター（auひかりの節約額・セット割を計算）| Toolbox</title>
+<meta name="description" content="今のネット料金と住居タイプ、auスマホの台数を入力するだけで、auひかりに乗り換えた場合の月額目安・スマホセット割・1か月/1年の節約額を自動計算。会員登録不要の無料ツールです。">
+<link rel="canonical" href="https://gerogeromaru.github.io/toolbox/hikari/">
+<meta property="og:title" content="光回線 乗り換え 料金シミュレーター（auひかりの節約額・セット割を計算）">
+<meta property="og:description" content="今のネット料金とauスマホの台数から、auひかり乗り換えの節約額・セット割を自動計算する無料ツール。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gerogeromaru.github.io/toolbox/hikari/">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 審査通過後にここへ広告コードを貼る -->
+</head>
+<body>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="../">🧰 Toolbox</a>
+    <nav><a href="../">ツール一覧</a></nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>光回線 乗り換え 料金シミュレーター</h1>
+  <p class="lead">今の自宅のネット料金と住居タイプ、auスマホの台数を入力すると、<strong>auひかりに乗り換えた場合の月額の目安</strong>と<strong>スマホセット割・節約額</strong>を自動で計算します。</p>
+
+  <div class="card">
+    <div class="row">
+      <label for="current">今の毎月のネット料金（円）</label>
+      <input type="number" id="current" inputmode="numeric" placeholder="例：6000" min="0" step="100">
+      <div class="hint">プロバイダ料金込みの月額を入力してください。明細やマイページで確認できます。</div>
+    </div>
+    <div class="row">
+      <label for="home">住居タイプ</label>
+      <select id="home">
+        <option value="house">戸建て</option>
+        <option value="mansion">マンション・集合住宅</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="aulines">auスマホの台数（家族分）</label>
+      <input type="number" id="aulines" inputmode="numeric" placeholder="例：2" min="0" step="1" value="0">
+      <div class="hint">auのスマホとセットにすると「スマホセット割」が1台あたり毎月適用されます（使っていなければ0でOK）。</div>
+    </div>
+    <button class="primary" id="calc">節約額を計算する</button>
+
+    <div class="result" id="result" hidden>
+      <p class="sub">乗り換えで節約できる金額（1か月・概算）</p>
+      <div class="big" id="save-month">—</div>
+      <table class="breakdown">
+        <tr><th>今のネット料金</th><td class="num" id="r-current"></td></tr>
+        <tr><th>auひかり 月額の目安</th><td class="num" id="r-base"></td></tr>
+        <tr><th>スマホセット割（合計）</th><td class="num" id="r-discount"></td></tr>
+        <tr><th>実質の月額</th><td class="num" id="r-net"></td></tr>
+        <tr><th>1か月の節約額</th><td class="num" id="r-month"></td></tr>
+        <tr><th>1年の節約額</th><td class="num" id="r-year"></td></tr>
+      </table>
+      <p class="sub" id="note" style="margin-top:10px;"></p>
+    </div>
+  </div>
+
+  <!-- ===== A8アフィリエイト枠：auひかりキャンペーン ===== -->
+  <div class="cta">
+    <div class="pr">PR</div>
+    <h3>auひかりは高額キャッシュバック＆セット割が魅力</h3>
+    <p>auスマホをお使いなら「スマホセット割」で毎月さらにお得に。今なら申込特典のキャッシュバックも。条件や金額は公式サイトでご確認ください。</p>
+    <a class="btn" href="https://px.a8.net/svt/ejp?a8mat=4B5R09+7PG0OI+348K+3H3DWY" target="_blank" rel="nofollow sponsored noopener">auひかりの料金・特典を見る</a>
+  </div>
+  <img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4B5R09+7PG0OI+348K+3H3DWY" alt="" style="position:absolute;left:-9999px;">
+  <!-- ===== /A8 ===== -->
+
+  <h2>計算の考え方</h2>
+  <table class="breakdown">
+    <tr><th>auひかり 月額目安（戸建て）</th><td class="num">約5,610円</td></tr>
+    <tr><th>auひかり 月額目安（マンション）</th><td class="num">約4,180円</td></tr>
+    <tr><th>スマホセット割</th><td class="num">1台あたり 最大1,100円/月（最大10台）</td></tr>
+  </table>
+  <p class="hint">※ 上記は代表的なプランの目安です。実際の料金・割引・特典はプランや契約条件、時期により異なります。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq">
+    <dt>工事費はかかりますか？</dt>
+    <dd>新規申込で工事費が実質無料になるキャンペーンが行われていることが多いです。最新の条件は公式サイトでご確認ください。</dd>
+    <dt>auスマホを使っていなくても安くなりますか？</dt>
+    <dd>セット割は使えませんが、回線料金そのものや申込特典（キャッシュバック）でお得になる場合があります。台数0でも月額の目安で試算できます。</dd>
+    <dt>キャッシュバックはいつもらえますか？</dt>
+    <dd>申込窓口によって金額・受取時期・条件が異なります。本ツールの試算には含めていません。詳細は公式・申込窓口でご確認ください。</dd>
+  </dl>
+
+  <p class="disclaimer">※ 本ツールの計算結果は一般的な相場をもとにした概算で、キャッシュバック等の特典は含みません。実際の料金・割引・特典は契約プランや時期により異なります。最新情報は各サービスの公式情報をご確認ください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="tool-list">
+    <li>
+      <a href="../phone-bill/">
+        <span class="t">📱 スマホ料金 見直しシミュレーター</span>
+        <span class="d">今のスマホ代とデータ量から格安SIM乗り換えの節約額を計算</span>
+      </a>
+    </li>
+    <li>
+      <a href="../electricity/">
+        <span class="t">💡 電気代計算ツール</span>
+        <span class="d">消費電力と使用時間から1日・1か月・1年の電気代を概算</span>
+      </a>
+    </li>
+    <li>
+      <a href="../take-home/">
+        <span class="t">💴 年収手取り計算ツール</span>
+        <span class="d">年収を入れるだけで手取り・税金・社会保険料を概算</span>
+      </a>
+    </li>
+  </ul>
+
+</main>
+
+<footer class="site">
+  <div class="container">
+    <a href="../">ツール一覧</a>
+    <a href="../privacy/">プライバシーポリシー</a>
+    <div style="margin-top:8px;">© 2026 Toolbox</div>
+  </div>
+</footer>
+
+<script>
+function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+
+document.getElementById('calc').addEventListener('click', function(){
+  const current = parseFloat(document.getElementById('current').value);
+  const home = document.getElementById('home').value;
+  const aulines = parseInt(document.getElementById('aulines').value, 10);
+
+  if (!(current > 0)) { alert('今の毎月のネット料金を入力してください'); return; }
+  const lines = (aulines > 0) ? aulines : 0;
+
+  const base = (home === 'mansion') ? 4180 : 5610;
+  const discount = Math.min(lines, 10) * 1100;
+  const net = Math.max(base - discount, 0);
+  const saveMonth = current - net;
+
+  document.getElementById('save-month').textContent = yen(Math.max(saveMonth, 0));
+  document.getElementById('r-current').textContent = yen(current);
+  document.getElementById('r-base').textContent = yen(base);
+  document.getElementById('r-discount').textContent = (discount > 0 ? '-' + yen(discount) : yen(0));
+  document.getElementById('r-net').textContent = yen(net);
+  document.getElementById('r-month').textContent = yen(saveMonth);
+  document.getElementById('r-year').textContent = yen(saveMonth * 12);
+
+  const note = document.getElementById('note');
+  if (saveMonth <= 0) {
+    note.textContent = '今の料金が既に安めのようです。ただしキャッシュバック特典は別途受け取れる場合があるため、申込窓口の特典も確認してみてください。';
+  } else if (lines > 0) {
+    note.textContent = 'auスマホ ' + lines + '台のセット割（毎月 ' + yen(discount) + '）を反映した実質月額で試算しています。';
+  } else {
+    note.textContent = 'auスマホをセットにすると、1台あたり毎月最大1,100円の割引がさらに見込めます。';
+  }
+  document.getElementById('result').hidden = false;
+});
+</script>
+</body>
+</html>
